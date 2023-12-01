@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 import com.hanhtet.stumanpro.alert.CustomAlertBox;
 import com.hanhtet.stumanpro.utils.Functions;
+import com.hanhtet.stumanpro.utils.SheetUtils;
 import com.hanhtet.stumanpro.utils.UserSession;
 
 import javafx.collections.ObservableList;
@@ -20,6 +21,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -191,6 +193,18 @@ public class MainWindow {
             return;
         }
         courseStage.show();
+    }
+
+    @FXML
+    void SyncFunction(ActionEvent event){
+        boolean result = functions.AutoSyncData();
+        if (!result){
+            Node source = (Node) event.getSource();
+            Stage primaryStage = (Stage) source.getScene().getWindow();
+            CustomAlertBox.showAlert(Alert.AlertType.ERROR, primaryStage, "Error at syncing!!", "Error occurred at Uploading the Local data to Google Sheet!", "Check your internet connection and try again. If not contact the Developer!");
+        } else{
+            System.out.println("Successfully synced!");
+        }
     }
 
     private void autoFetch(){

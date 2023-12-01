@@ -428,26 +428,23 @@ public class SheetUtils {
                     .setFields("spreadsheetId")
                     .execute();
         } catch (IOException e) {
-            System.err.println(e);
             return null;
         }
 
         String spreadsheetId = spreadsheet.getSpreadsheetId();
-        System.out.println("Created new spreadsheet with ID: " + spreadsheetId);
-
-        // Change the default sheet title ("Sheet1") to the specified title (sheetName)
+        System.out.println("Created new spreadsheet named: "+sheetName);
+        
         try {
             BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest();
             batchUpdateRequest.setRequests(Collections.singletonList(new Request()
                     .setUpdateSheetProperties(new UpdateSheetPropertiesRequest()
                             .setProperties(new SheetProperties().setTitle(sheetName))
                             .setFields("title"))));
-
             sheetService.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest).execute();
         } catch (IOException e) {
             System.err.println("Error updating sheet title: " + e.getMessage());
         }
-
+        
         // Set the permission to allow anyone with the link to edit
         String permissionId = "anyoneWithLink";
         Permission newPermission = new Permission()
@@ -458,7 +455,7 @@ public class SheetUtils {
         try {
             driveService.permissions().create(spreadsheetId, newPermission).execute();
         } catch (IOException e) {
-            System.err.println(e);
+            System.err.println("Can't add data in this create file instance!");
         }
         return spreadsheetId;
     }
@@ -488,7 +485,7 @@ public class SheetUtils {
         try {
             Map<Integer, Object> resultData = fetchDataFromGoogleSheet(tableId, tableRange);
             List<List<Object>> newData = (List<List<Object>>) resultData.get(1);
-            String filePath = DATA.FILE_PATH + "\\"+sheetName+".xlsx";
+            String filePath = DOWNLOAD_XLXS_FOLDER_PATH + "\\"+sheetName+".xlsx";
             
             List<List<Object>> localData = readLocalFile(filePath);
             if (!newData.equals(localData)) {   

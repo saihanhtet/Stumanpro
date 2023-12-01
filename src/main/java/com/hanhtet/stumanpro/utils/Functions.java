@@ -175,10 +175,14 @@ public class Functions {
 
     public boolean AutoSyncData(){
         try {
-            SheetUtils.syncWithGoogleSheet(DATA.USER_TABLE_ID,DATA.USER_TABLE_RANGE);
+            Map<String, String> spreadsheetId = SheetUtils.readSpreadsheetInfoFromFile();
+            SheetUtils.syncWithLocalSheet("lcfa_users",spreadsheetId.get("lcfa_users"), DATA.USER_TABLE_RANGE);
+            SheetUtils.syncWithLocalSheet("lcfa_courses",spreadsheetId.get("lcfa_courses"), DATA.COURSE_TABLE_RANGE);
+            System.out.println("Successfully synced!");
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "An error occurred while syncing courses from the sheet", e);
             System.err.println("An error occurred while syncing courses from the sheet.");
+            return false;
         }
         return true;
     }
@@ -228,4 +232,5 @@ public class Functions {
             System.out.println(spreadsheetId.get("lcfa_courses"));
         }
     }
+    
 }
