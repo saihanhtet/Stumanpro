@@ -230,9 +230,8 @@ public class SheetUtils {
         //     LOGGER.log(Level.SEVERE, "An error occurred while appending data to the sheet", e);
         //     System.err.println("An error occurred while appending data to the sheet.");
         // }
-        downloadFile("new_testing", DATA.USER_TABLE_ID, DATA.USER_TABLE_RANGE);
-        syncWithGoogleSheet(DATA.USER_TABLE_ID, DATA.USER_TABLE_RANGE);
-        updateGoogleSheet(newData,DATA.COURSE_TABLE_ID, DATA.COURSE_TABLE_RANGE);
+        //downloadFile("new_testing", DATA.USER_TABLE_ID, DATA.USER_TABLE_RANGE);
+        syncWithLocalSheet(DATA.USER_TABLE_ID, DATA.USER_TABLE_RANGE);
     }
     
     private static String getDownloadFolderPath() {
@@ -402,6 +401,25 @@ public class SheetUtils {
             LOGGER.log(Level.SEVERE, "Error occurred while syncing", e);
         }
     }
+    @SuppressWarnings("unchecked")
+    public static void syncWithLocalSheet(String tableId, String tableRange){
+        try {
+            Map<Integer, Object> resultData = fetchDataFromGoogleSheet(tableId, tableRange);
+            List<List<Object>> newData = (List<List<Object>>) resultData.get(1);
+            String filePath = downloadFolder + "\\"+"new_testing.xlsx";
+            
+            List<List<Object>> localData = readLocalFile(filePath);
+            if (!newData.equals(localData)) {   
+                updateGoogleSheet(localData, tableId, tableRange);// Update google sheet file with local data
+                System.out.println("Google Sheet file updated successfully.");
+            } else {
+                System.out.println("Google Sheet file is already up-to-date.");
+            }
+        } catch (IOException | GeneralSecurityException e) {
+            LOGGER.log(Level.SEVERE, "Error occurred while syncing", e);
+        }
+    }
+
     private static void updateGoogleSheet(List<List<Object>> newData, String spreadsheetId, String range) {
         try {
             ValueRange body = new ValueRange().setValues(newData);
@@ -455,6 +473,7 @@ public class SheetUtils {
             Workbook workbook = new XSSFWorkbook(fileInputStream);
             Sheet sheet = workbook.getSheetAt(0); // Assuming the data is in the first sheet
             List<List<Object>> data = SheetUtils.convertSheetToList(sheet);
+            data.remove(0); // remove the header
             workbook.close();
             fileInputStream.close();
             return data;
