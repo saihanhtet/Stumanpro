@@ -222,5 +222,7 @@ public class MainWindow {
         String name = userSession.getName();
         welcome_name.setText("Welcome back "+name+"!");
         autoFetch();
+
+        functions.InitializeProject();
     }
 }

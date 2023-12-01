@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -179,5 +181,51 @@ public class Functions {
             System.err.println("An error occurred while syncing courses from the sheet.");
         }
         return true;
+    }
+
+    public void InitializeProject(){
+        //create the sheets
+
+        boolean sheetsExist = SetupUtils.checkIfGoogleSheetsExist();
+        boolean localFilesExist = SetupUtils.checkIfLocalFilesExist();
+
+        if (!sheetsExist || !localFilesExist) {
+            String lcfa_users = SheetUtils.createGoogleSheet("lcfa_users");
+            String lcfa_courses = SheetUtils.createGoogleSheet("lcfa_courses");
+
+            Map<Integer, String> user_adjust_range = SheetUtils.adjustRange(DATA.USER_TABLE_RANGE);
+            Map<Integer, String> course_adjust_range = SheetUtils.adjustRange(DATA.COURSE_TABLE_RANGE);
+            Map<String, String> spreadsheetId = new HashMap<>();
+
+            spreadsheetId.put("lcfa_users", lcfa_users);
+            spreadsheetId.put("lcfa_courses", lcfa_courses);
+            SheetUtils.writeSpreadsheetInfoToFile(spreadsheetId);
+
+            List<Object> userHeaderData = new ArrayList<>(List.of(
+                "id", "firstname", "lastname", "email", 
+                "password", "phone_no", "picture", 
+                "address", "role"
+            ));
+
+            List<Object> courseHeaderData = new ArrayList<>(List.of("id","name","price"));
+            
+            try {
+                SheetUtils.headerAdd(userHeaderData,lcfa_users,user_adjust_range.get(1));
+                SheetUtils.headerAdd(courseHeaderData,lcfa_courses,course_adjust_range.get(1));
+            } catch (IOException e) {
+                System.err.println("Error at adding header!");
+            }
+
+            SheetUtils.downloadFile("lcfa_users", lcfa_users, DATA.USER_TABLE_RANGE);
+            SheetUtils.downloadFile("lcfa_courses", lcfa_courses, DATA.COURSE_TABLE_RANGE);
+            SetupUtils.storeSetupCompletionFlag(true);
+
+        } else{
+            System.out.println("Google Sheets or local files already exist. Skipping setup.");
+            Map<String, String> spreadsheetId = SheetUtils.readSpreadsheetInfoFromFile();
+
+            System.out.println(spreadsheetId.get("lcfa_users"));
+            System.out.println(spreadsheetId.get("lcfa_courses"));
+        }
     }
 }

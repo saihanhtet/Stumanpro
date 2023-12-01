@@ -1,21 +1,24 @@
 package com.hanhtet.stumanpro.utils;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.FileSystems;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Iterator;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -38,24 +41,70 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.Permission;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
+import com.google.api.services.sheets.v4.model.Request;
+import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
+import com.google.api.services.sheets.v4.model.UpdateSheetPropertiesRequest;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 public class SheetUtils {
     private static final Logger LOGGER = Logger.getLogger(DATA.APPLICATION_NAME);
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH;
+    private static final String GOOGLE_SHEETS_DIRECTORY;
 
     private static final String downloadFolder = getDownloadFolderPath();
+    private static final String DOWNLOAD_XLXS_FOLDER_PATH;
     static {
         TOKENS_DIRECTORY_PATH = System.getProperty("user.home") + DATA.TOKEN_PATH;
+        DOWNLOAD_XLXS_FOLDER_PATH = System.getProperty("user.home") + DATA.FILE_PATH;
+        GOOGLE_SHEETS_DIRECTORY = System.getProperty("user.home") + DATA.GOOGLE_SHEETS_DIRECTORY;
     }
     private static final List<String> SCOPES = Arrays.asList(DriveScopes.DRIVE, SheetsScopes.SPREADSHEETS);
 
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
     private static final Sheets sheetService = getSheetsService();
     private static final Drive driveService = getDriveService();
+
+    public static Sheets getSheetService(){
+        return sheetService;
+    }
+
+    public static void writeSpreadsheetInfoToFile(Map<String, String> spreadsheetInfo) {
+        String filePath = GOOGLE_SHEETS_DIRECTORY + "\\" + "sheetId.txt";
+        File file = new File(filePath);
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+            try (FileOutputStream fileOut = new FileOutputStream(filePath);
+                ObjectOutputStream objectOut = new ObjectOutputStream(fileOut)) {
+                objectOut.writeObject(spreadsheetInfo);
+                System.out.println("Spreadsheet info successfully written to file.");
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.err.println("Error occurred at writing the spreadsheet Id!");
+            }
+        }else{
+            System.out.println("Google sheet Id are already added!");
+        }
+    }
+    @SuppressWarnings("unchecked")
+    public static Map<String, String> readSpreadsheetInfoFromFile() {
+        String filePath = GOOGLE_SHEETS_DIRECTORY + "\\" + "sheetId.txt";
+        Map<String, String> spreadsheetInfo = new HashMap<>();
+        try (FileInputStream fileIn = new FileInputStream(filePath);
+             ObjectInputStream objectIn = new ObjectInputStream(fileIn)) {
+            Object obj = objectIn.readObject();
+            if (obj instanceof Map) {
+                spreadsheetInfo = (Map<String, String>) obj;
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            System.err.println("Error occurred at reading the spreadsheet Id!");
+        }
+        return spreadsheetInfo;
+    }
 
     // create sheet sheetService for request
     private static Sheets getSheetsService() {
@@ -97,6 +146,19 @@ public class SheetUtils {
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+    }
+
+    public static void headerAdd(List<Object> headerData, String spreadsheetId, String range) throws IOException{
+        try {
+            ValueRange body = new ValueRange().setValues(Collections.singletonList(headerData));
+            sheetService.spreadsheets().values()
+                        .append(spreadsheetId, range, body)
+                        .setValueInputOption("RAW")
+                        .execute();
+            System.out.println("Header is successfully added!");
+        } catch (Exception e) {
+            System.err.println(e);
+        }
     }
 
     public static void appendDataToSheet(@org.jetbrains.annotations.NotNull List<List<Object>> newData, String spreadsheetId, String range) throws IOException, GeneralSecurityException {
@@ -231,7 +293,7 @@ public class SheetUtils {
         //     System.err.println("An error occurred while appending data to the sheet.");
         // }
         //downloadFile("new_testing", DATA.USER_TABLE_ID, DATA.USER_TABLE_RANGE);
-        syncWithLocalSheet(DATA.USER_TABLE_ID, DATA.USER_TABLE_RANGE);
+        syncWithLocalSheet("new_testing",DATA.USER_TABLE_ID, DATA.USER_TABLE_RANGE);
     }
     
     private static String getDownloadFolderPath() {
@@ -325,7 +387,7 @@ public class SheetUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static void downloadFile(String sheetName, String spreadsheetId, String range){
+    public static void downloadFile(String sheetName, String spreadsheetId, String range) {
         try {
             Map<Integer, Object> response_data = SheetUtils.readFromSheetFull(spreadsheetId, range);
             Object responseData = response_data.get(1);
@@ -335,25 +397,31 @@ public class SheetUtils {
                 List<?> dataList = (List<?>) responseData;
                 if (!dataList.isEmpty() && dataList.get(0) instanceof List) {
                     sheetData = (List<List<Object>>) responseData;
-                    String filePath = downloadFolder + "\\"+sheetName+".xlsx";
-                    createExcelFile(sheetData, filePath, sheetName);
-                    System.out.println("Excel file created successfully!");
+
+                    String filePath = DOWNLOAD_XLXS_FOLDER_PATH + "\\" + sheetName + ".xlsx";
+                    File file = new File(filePath);
+                    if (!file.exists()) {
+                        file.getParentFile().mkdirs(); // Create parent directories if they don't exist
+                        createExcelFile(sheetData, filePath, sheetName);
+                        System.out.println("Excel file created successfully!");
+                    } else {
+                        System.out.println("File already exists at: " + filePath);
+                    }
                 } else {
                     System.out.println("No data found in the sheet.");
                 }
             } else {
                 System.out.println("Retrieved data is not in the expected format");
             }
-            
         } catch (IOException | GeneralSecurityException e) {
             LOGGER.log(Level.SEVERE, "Error occurred while downloading data from the sheet.", e);
             System.err.println("Error occurred while downloading data from the sheet.");
         }
     }
 
-    public static void createGoogleSheet(String sheetName, String sheetFieldName){
+    public static String createGoogleSheet(String sheetName) {
         Spreadsheet spreadsheet = new Spreadsheet()
-                .setProperties(new SpreadsheetProperties().setTitle(sheetName));
+                .setProperties(new SpreadsheetProperties().setTitle(sheetName)); // Set spreadsheet title
 
         try {
             spreadsheet = sheetService.spreadsheets().create(spreadsheet)
@@ -361,10 +429,24 @@ public class SheetUtils {
                     .execute();
         } catch (IOException e) {
             System.err.println(e);
+            return null;
         }
 
         String spreadsheetId = spreadsheet.getSpreadsheetId();
         System.out.println("Created new spreadsheet with ID: " + spreadsheetId);
+
+        // Change the default sheet title ("Sheet1") to the specified title (sheetName)
+        try {
+            BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest();
+            batchUpdateRequest.setRequests(Collections.singletonList(new Request()
+                    .setUpdateSheetProperties(new UpdateSheetPropertiesRequest()
+                            .setProperties(new SheetProperties().setTitle(sheetName))
+                            .setFields("title"))));
+
+            sheetService.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest).execute();
+        } catch (IOException e) {
+            System.err.println("Error updating sheet title: " + e.getMessage());
+        }
 
         // Set the permission to allow anyone with the link to edit
         String permissionId = "anyoneWithLink";
@@ -376,11 +458,11 @@ public class SheetUtils {
         try {
             driveService.permissions().create(spreadsheetId, newPermission).execute();
         } catch (IOException e) {
-           System.err.println(e);
+            System.err.println(e);
         }
-
-        System.out.println(spreadsheetId);
+        return spreadsheetId;
     }
+
 
     @SuppressWarnings("unchecked")
     public static void syncWithGoogleSheet(String tableId, String tableRange) {
@@ -402,11 +484,11 @@ public class SheetUtils {
         }
     }
     @SuppressWarnings("unchecked")
-    public static void syncWithLocalSheet(String tableId, String tableRange){
+    public static void syncWithLocalSheet(String sheetName,String tableId, String tableRange){
         try {
             Map<Integer, Object> resultData = fetchDataFromGoogleSheet(tableId, tableRange);
             List<List<Object>> newData = (List<List<Object>>) resultData.get(1);
-            String filePath = downloadFolder + "\\"+"new_testing.xlsx";
+            String filePath = DATA.FILE_PATH + "\\"+sheetName+".xlsx";
             
             List<List<Object>> localData = readLocalFile(filePath);
             if (!newData.equals(localData)) {   
