@@ -1,0 +1,1 @@
+c:; cd 'c:\Users\hanhtet\Documents\Java-workspace\Stumanpro'; & 'C:\Program Files\Java\jdk-19.0.2\bin\java.exe' '@C:\Users\hanhtet\AppData\Local\Temp\cp_dnnb0xqd2che448rxyf718rfd.argfile' 'com.hanhtet.stumanpro.MainApplication'

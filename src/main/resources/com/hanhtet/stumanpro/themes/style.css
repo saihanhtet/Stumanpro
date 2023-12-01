@@ -1,0 +1,205 @@
+*{
+   -fx-primary: #262b40;
+   -fx-secondary: #ee6c4d;
+   -fx-hover: #3d5a80;
+   -fx-bg: #e0fbfc;
+   -fx-text: #000000;
+   -fx-sidebar-text:#ffffff;
+}
+
+.bg-red{
+    -fx-background-color: -fx-secondary;
+}
+.bg-blue{
+    -fx-background-color: -fx-hover;
+}
+.bg-primary{
+    -fx-background-color: -fx-primary;
+}
+
+.login_page {
+  -fx-background-color: -fx-bg;
+  -fx-text-fill: -fx-text;
+}
+.login_title {
+  -fx-font-family: Aria;
+  -fx-font-size: 19;
+  -fx-font-weight: 700;
+  -fx-text-fill: -fx-text;
+}
+.login_btn {
+  -fx-background-color: linear-gradient(to right, #2881ea, #3b95ee);
+  -fx-text-fill:-fx-text;
+  -fx-font-size: 16;
+  -fx-font-weight: 600;
+}
+.login_btn:hover {
+  -fx-background-color: -fx-hover;
+  -fx-text-fill:-fx-text;
+  -fx-font-size: 16;
+  -fx-font-weight: 600;
+}
+.login_input {
+  -fx-border-style: solid;
+  -fx-border-color: #ccc;
+  -fx-border-radius: 5;
+  -fx-background-color: -fx-bg;
+  -fx-background-radius: 5;
+  -fx-font-size: 14;
+  -fx-font-weight: 600;
+  -fx-font-family: Aria;
+  -fx-text-fill: -fx-text;
+}
+.login_input:error {
+  -fx-text-box-border: red;
+  -fx-focus-color: red;
+  -fx-text-fill: -fx-secondary;
+}
+.link {
+  -fx-text-fill: -fx-text;
+  -fx-font-size: 13;
+}
+.dashboard{
+    -fx-background-color: -fx-bg;
+    -fx-text-fill: -fx-text;
+}
+.sidebar{
+    -fx-background-color: -fx-primary;
+    -fx-text-fill: -fx-sidebar-text;
+}
+.header{
+    -fx-background-color:-fx-primary;
+}
+.brand{
+    -fx-font-size:17;
+    -fx-text-fill: -fx-sidebar-text;
+    -fx-font-weight: 800;
+}
+.sidebar-btn{
+    -fx-background-color:-fx-primary;
+    -fx-padding:10;
+    -fx-font-size:15;
+    -fx-font-weight: 600;
+    -fx-background-radius:5;
+    -fx-text-fill: -fx-sidebar-text;
+}
+.sidebar-btn:hover{
+    -fx-background-color: -fx-hover;
+    -fx-background-color: linear-gradient(to right, #2881ea, #3b95ee);
+    -fx-padding:10;
+    -fx-font-size:15;
+    -fx-font-weight: 600;
+    -fx-background-radius:5;
+    -fx-text-fill:-fx-sidebar-text;
+}
+.status-card{
+    -fx-background-color: -fx-primary;
+    -fx-padding:10;
+    -fx-background-radius: 5;
+}
+
+.svg{
+    -fx-fill: -fx-sidebar-text;
+}
+.status-card .Label{
+    -fx-text-fill:-fx-sidebar-text;
+    -fx-font-size: 16;
+    -fx-font-weight:700;
+}
+.welcome-txt{
+   -fx-padding:10;
+}
+
+.welcome-txt .Label{
+    -fx-text-fill: -fx-sidebar-text;
+    -fx-font-size: 16;
+    -fx-font-weight:700;
+}
+.beamcumb{
+    -fx-text-fill: -fx-secondary;
+    -fx-font-size: 14;
+    -fx-font-weight:700;
+}
+.table-view {
+    -fx-background-color: transparent;
+}
+.table-view .column-header-background .filler {
+    -fx-background-color: transparent;
+}
+.table-view .corner {
+    -fx-background-color: transparent;
+}
+.bg{
+    -fx-background-color:-fx-bg;
+}
+.form_inquire{
+    -fx-padding: 10;
+    -fx-spacing:20;
+}
+.form_inquire .Label{
+    -fx-font-size: 16;
+    -fx-font-weight: 800;
+    -fx-text-fill: -fx-text;
+}
+.select_box{
+    -fx-padding:3;
+    -fx-background-color: -fx-bg;
+    -fx-border-color: #ccc;
+    -fx-border-radius: 5;
+    -fx-text-fill: -fx-text;
+    -fx-text-box-border: red;
+    -fx-cursor: hand;
+}
+.select_box:hover{
+    -fx-padding:3;
+    -fx-border-color: -fx-primary;
+    -fx-border-radius: 5;
+    -fx-text-box-border: red;
+    -fx-cursor: hand;
+}
+.form_inquire .button{
+    -fx-padding:8;
+    -fx-font-size:14;
+    -fx-text-fill:-fx-text;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+}
+
+.student_manage_options{
+-fx-padding: 10;
+-fx-spacing:20;
+}
+.student_manage_options .Label{
+    -fx-font-size: 16;
+    -fx-font-weight: 800;
+    -fx-text-fill: -fx-text;
+}
+.student_manage_options .button{
+    -fx-padding:8;
+    -fx-font-size:14;
+    -fx-text-fill:-fx-text;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+}
+.form_inquire .button:hover{
+    -fx-padding:8;
+    -fx-font-size:14;
+    -fx-text-fill:-fx-text;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+}
+
+.table-view .virtual-flow .scroll-bar:vertical,
+.table-view .virtual-flow .scroll-bar:vertical .track,
+.table-view .virtual-flow .scroll-bar:vertical .track-background,
+.table-view .virtual-flow .scroll-bar:horizontal,
+.table-view .virtual-flow .scroll-bar:horizontal .track,
+.table-view .virtual-flow .scroll-bar:horizontal .track-background {
+    -fx-background-color: transparent;
+}
+.table-view .virtual-flow .scroll-bar:vertical .thumb{
+    -fx-background-color:  -fx-primary;
+}
+.table-view .virtual-flow .scroll-bar:horizontal .thumb {
+    -fx-background-color:  -fx-primary;
+}

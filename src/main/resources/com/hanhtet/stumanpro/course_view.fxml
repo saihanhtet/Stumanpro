@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="533.0" prefHeight="600.0" prefWidth="533.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hanhtet.stumanpro.CourseManagement">
+   <children>
+      <VBox alignment="TOP_CENTER" layoutX="94.0" layoutY="14.0" prefHeight="200.0" prefWidth="100.0" spacing="20.0" style="-fx-padding: 10;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label text="Course View">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <TableView fx:id="course_table" editable="true" prefHeight="133.0" prefWidth="680.0" VBox.vgrow="ALWAYS">
+              <columns>
+                <TableColumn fx:id="course_id" editable="false" maxWidth="75.0" minWidth="75.0" prefWidth="75.0" text="id" />
+                <TableColumn fx:id="course_name" minWidth="250.0" prefWidth="250.0" text="Course Name" />
+                  <TableColumn fx:id="course_per_price" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" text="Price" />
+              </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
