@@ -17,6 +17,7 @@ import com.hanhtet.stumanpro.entity.User;
 public class Functions {
     private static final Logger LOGGER = Logger.getLogger(DATA.APPLICATION_NAME);
     
+    
     public boolean RegisterUser(User user){
         try {
             List<Object> userData = user.getAllDataAsList();
@@ -125,10 +126,11 @@ public class Functions {
         newData.add(newRow);
         System.out.println(existingData +"|"+ newRow);
         try {
-            SheetUtils.appendDataToSheet(newData, table_id, table_range);
+            SheetUtils.appendDataToLocalFile(newData, DATA.DOWNLOAD_XLXS_FOLDER_PATH+"\\"+"lcfa_courses.xlsx");
+            //SheetUtils.appendDataToSheet(newData, table_id, table_range);
             System.out.println("Data added successfully to the sheet!");
             return true;
-        } catch (IOException | GeneralSecurityException e) {
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "An error occurred while appending data to the sheet", e);
             System.err.println("An error occurred while appending data to the sheet.");
             return false;
@@ -155,7 +157,8 @@ public class Functions {
 	public List<Course> getCoursesFromSheet() {
         List<Course> courses = new ArrayList<>();
         try {
-            List<List<Object>> data = SheetUtils.readFromSheet(DATA.COURSE_TABLE_ID, DATA.COURSE_TABLE_RANGE);
+            String courseFile = System.getProperty("user.home") + DATA.FILE_PATH + "\\" + "lcfa_courses.xlsx";
+            List<List<Object>> data = SheetUtils.readLocalFile(courseFile);
             if (data != null && !data.isEmpty()) {
                 for (List<Object> row : data) {
                     Course course = new Course(
@@ -166,25 +169,11 @@ public class Functions {
                     courses.add(course);
                 }
             }
-        } catch (IOException | GeneralSecurityException e) {
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "An error occurred while fetching courses from the sheet", e);
             System.err.println("An error occurred while fetching courses from the sheet.");
         }
         return courses;
-    }
-
-    public boolean AutoSyncData(){
-        try {
-            Map<String, String> spreadsheetId = SheetUtils.readSpreadsheetInfoFromFile();
-            SheetUtils.syncWithLocalSheet("lcfa_users",spreadsheetId.get("lcfa_users"), DATA.USER_TABLE_RANGE);
-            SheetUtils.syncWithLocalSheet("lcfa_courses",spreadsheetId.get("lcfa_courses"), DATA.COURSE_TABLE_RANGE);
-            System.out.println("Successfully synced!");
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "An error occurred while syncing courses from the sheet", e);
-            System.err.println("An error occurred while syncing courses from the sheet.");
-            return false;
-        }
-        return true;
     }
 
     public void InitializeProject(){

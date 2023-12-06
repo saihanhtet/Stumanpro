@@ -21,10 +21,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -52,16 +55,9 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 public class SheetUtils {
     private static final Logger LOGGER = Logger.getLogger(DATA.APPLICATION_NAME);
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static final String TOKENS_DIRECTORY_PATH;
-    private static final String GOOGLE_SHEETS_DIRECTORY;
 
     private static final String downloadFolder = getDownloadFolderPath();
-    private static final String DOWNLOAD_XLXS_FOLDER_PATH;
-    static {
-        TOKENS_DIRECTORY_PATH = System.getProperty("user.home") + DATA.TOKEN_PATH;
-        DOWNLOAD_XLXS_FOLDER_PATH = System.getProperty("user.home") + DATA.FILE_PATH;
-        GOOGLE_SHEETS_DIRECTORY = System.getProperty("user.home") + DATA.GOOGLE_SHEETS_DIRECTORY;
-    }
+
     private static final List<String> SCOPES = Arrays.asList(DriveScopes.DRIVE, SheetsScopes.SPREADSHEETS);
 
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
@@ -73,7 +69,7 @@ public class SheetUtils {
     }
 
     public static void writeSpreadsheetInfoToFile(Map<String, String> spreadsheetInfo) {
-        String filePath = GOOGLE_SHEETS_DIRECTORY + "\\" + "sheetId.txt";
+        String filePath = DATA.GOOGLE_SHEETS_DIRECTORY + "\\" + "sheetId.txt";
         File file = new File(filePath);
         if (!file.exists()) {
             file.getParentFile().mkdirs();
@@ -89,9 +85,10 @@ public class SheetUtils {
             System.out.println("Google sheet Id are already added!");
         }
     }
+    
     @SuppressWarnings("unchecked")
     public static Map<String, String> readSpreadsheetInfoFromFile() {
-        String filePath = GOOGLE_SHEETS_DIRECTORY + "\\" + "sheetId.txt";
+        String filePath = DATA.GOOGLE_SHEETS_DIRECTORY + "\\" + "sheetId.txt";
         Map<String, String> spreadsheetInfo = new HashMap<>();
         try (FileInputStream fileIn = new FileInputStream(filePath);
              ObjectInputStream objectIn = new ObjectInputStream(fileIn)) {
@@ -141,7 +138,7 @@ public class SheetUtils {
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(DATA.TOKENS_DIRECTORY_PATH)))
                 .setAccessType("offline")
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
@@ -158,35 +155,6 @@ public class SheetUtils {
             System.out.println("Header is successfully added!");
         } catch (Exception e) {
             System.err.println(e);
-        }
-    }
-
-    public static void appendDataToSheet(@org.jetbrains.annotations.NotNull List<List<Object>> newData, String spreadsheetId, String range) throws IOException, GeneralSecurityException {
-        List<List<Object>> existingData = readFromSheet(spreadsheetId, range);
-        int lastRowIndex = (existingData != null && !existingData.isEmpty()) ? existingData.size() : 0;
-        int newId = (lastRowIndex > 0) ? Integer.parseInt(existingData.get(lastRowIndex - 1).get(0).toString()) + 1 : 1;
-    
-        List<Object> newRow = new ArrayList<>();
-        for (List<Object> dataRow: newData){
-            System.out.println(dataRow);
-            newRow.add(Integer.toString(newId));
-            for (Object data : dataRow){
-                newRow.add(data);
-            }
-        }
-        
-        
-        String rangeForAppend = range.substring(0, range.indexOf('!') + 1) + "A" + (lastRowIndex + 2) + ":H";
-        ValueRange body = new ValueRange().setValues(Collections.singletonList(newRow));
-        try {
-            sheetService.spreadsheets().values()
-                     .append(spreadsheetId, rangeForAppend, body)
-                     .setValueInputOption("RAW")
-                     .execute();
-            System.out.println("Data successfully appended to the sheet with ID: " + newId);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "An error occurred while appending data to the sheet", e);
-            System.err.println("An error occurred while appending data to the sheet.");
         }
     }
 
@@ -232,7 +200,6 @@ public class SheetUtils {
         return result;
     }
 
-
     public static void main(String... args) throws GeneralSecurityException {
         // List<List<Object>> newData = new ArrayList<>();
         // List<Object> newRow = new ArrayList<>();
@@ -274,18 +241,6 @@ public class SheetUtils {
         
         // String spreadsheetId = "1Ww4VDQGcszWx_dROEC85E-qCvJ7m5-LL8s9UXS-2S_M";
         // String range = "Sheet1!A:H";
-
-        List<List<Object>> newData = new ArrayList<>();
-        List<Object> newRow = new ArrayList<>();
-        newRow.add("sai");
-        newRow.add("saihanhtet@gmail.com");
-        newRow.add("P@ssw0rd2006");
-        newRow.add("9400925900");
-        newRow.add("null");
-        newRow.add("home");
-        newRow.add("admin");
-        newData.add(newRow);
-
         // try {
         //     SheetUtils.appendDataToSheet(newData, DATA.USER_TABLE_ID, DATA.USER_TABLE_RANGE);
         // } catch (IOException | GeneralSecurityException e) {
@@ -293,11 +248,50 @@ public class SheetUtils {
         //     System.err.println("An error occurred while appending data to the sheet.");
         // }
         //downloadFile("new_testing", DATA.USER_TABLE_ID, DATA.USER_TABLE_RANGE);
-        syncWithLocalSheet("new_testing",DATA.USER_TABLE_ID, DATA.USER_TABLE_RANGE);
+        //syncWithLocalSheet("new_testing",DATA.USER_TABLE_ID, DATA.USER_TABLE_RANGE);
+
+        List<Object> newData = new ArrayList<>();
+        newData.add(1);
+        newData.add("O level");
+        newData.add(2993);
+
+
+        //editDataInLocalFile("1", newData, DATA.DOWNLOAD_XLXS_FOLDER_PATH +"\\"+"lcfa_courses.xlsx");
+        deleteRowById("2", DATA.DOWNLOAD_XLXS_FOLDER_PATH +"\\"+"lcfa_courses.xlsx");
     }
     
     private static String getDownloadFolderPath() {
         return FileSystems.getDefault().getPath(System.getProperty("user.home"), "Downloads").toString();
+    }
+
+    // add / delete/ update data to online sheet
+    public static void appendDataToSheet(@org.jetbrains.annotations.NotNull List<List<Object>> newData, String spreadsheetId, String range) throws IOException, GeneralSecurityException {
+        List<List<Object>> existingData = readFromSheet(spreadsheetId, range);
+        int lastRowIndex = (existingData != null && !existingData.isEmpty()) ? existingData.size() : 0;
+        int newId = (lastRowIndex > 0) ? Integer.parseInt(existingData.get(lastRowIndex - 1).get(0).toString()) + 1 : 1;
+    
+        List<Object> newRow = new ArrayList<>();
+        for (List<Object> dataRow: newData){
+            System.out.println(dataRow);
+            newRow.add(Integer.toString(newId));
+            for (Object data : dataRow){
+                newRow.add(data);
+            }
+        }
+        
+        
+        String rangeForAppend = range.substring(0, range.indexOf('!') + 1) + "A" + (lastRowIndex + 2) + ":H";
+        ValueRange body = new ValueRange().setValues(Collections.singletonList(newRow));
+        try {
+            sheetService.spreadsheets().values()
+                     .append(spreadsheetId, rangeForAppend, body)
+                     .setValueInputOption("RAW")
+                     .execute();
+            System.out.println("Data successfully appended to the sheet with ID: " + newId);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "An error occurred while appending data to the sheet", e);
+            System.err.println("An error occurred while appending data to the sheet.");
+        }
     }
 
     public static void deleteRowById(String idToDelete, String spreadsheetId, String range) throws IOException, GeneralSecurityException {
@@ -368,13 +362,14 @@ public class SheetUtils {
         }
     }
 
+    // read from online full and without header
     public static List<List<Object>> readFromSheet(String spreadsheetId, String range) throws IOException, GeneralSecurityException {
         ValueRange response = sheetService.spreadsheets().values()
                 .get(spreadsheetId, range)
                 .execute();
         return response.getValues();
     }
-    
+
     public static Map<Integer, Object> readFromSheetFull(String spreadsheetId, String range) throws IOException, GeneralSecurityException {
         Map<Integer, String> return_list = adjustRange(range);
         Map<Integer, Object> result = new HashMap<>();
@@ -398,7 +393,7 @@ public class SheetUtils {
                 if (!dataList.isEmpty() && dataList.get(0) instanceof List) {
                     sheetData = (List<List<Object>>) responseData;
 
-                    String filePath = DOWNLOAD_XLXS_FOLDER_PATH + "\\" + sheetName + ".xlsx";
+                    String filePath = DATA.DOWNLOAD_XLXS_FOLDER_PATH + "\\" + sheetName + ".xlsx";
                     File file = new File(filePath);
                     if (!file.exists()) {
                         file.getParentFile().mkdirs(); // Create parent directories if they don't exist
@@ -460,7 +455,6 @@ public class SheetUtils {
         return spreadsheetId;
     }
 
-
     @SuppressWarnings("unchecked")
     public static void syncWithGoogleSheet(String tableId, String tableRange) {
         try {
@@ -480,12 +474,13 @@ public class SheetUtils {
             LOGGER.log(Level.SEVERE, "Error occurred while syncing", e);
         }
     }
+    
     @SuppressWarnings("unchecked")
     public static void syncWithLocalSheet(String sheetName,String tableId, String tableRange){
         try {
             Map<Integer, Object> resultData = fetchDataFromGoogleSheet(tableId, tableRange);
             List<List<Object>> newData = (List<List<Object>>) resultData.get(1);
-            String filePath = DOWNLOAD_XLXS_FOLDER_PATH + "\\"+sheetName+".xlsx";
+            String filePath = DATA.DOWNLOAD_XLXS_FOLDER_PATH + "\\"+sheetName+".xlsx";
             
             List<List<Object>> localData = readLocalFile(filePath);
             if (!newData.equals(localData)) {   
@@ -546,13 +541,14 @@ public class SheetUtils {
         return SheetUtils.readFromSheetFull(spreadsheetId, range);
     }
 
-    private static List<List<Object>> readLocalFile(String filePath) {
+    // read add update delete local file
+    public static List<List<Object>> readLocalFile(String filePath) {
         try{
             FileInputStream fileInputStream = new FileInputStream(filePath);
             Workbook workbook = new XSSFWorkbook(fileInputStream);
             Sheet sheet = workbook.getSheetAt(0); // Assuming the data is in the first sheet
             List<List<Object>> data = SheetUtils.convertSheetToList(sheet);
-            data.remove(0); // remove the header
+            data.remove(0);
             workbook.close();
             fileInputStream.close();
             return data;
@@ -561,6 +557,151 @@ public class SheetUtils {
         }
         return null;
     }
+
+    public static void appendDataToLocalFile(List<List<Object>> newData, String filePath) {
+        try {
+            FileInputStream fileInputStream = new FileInputStream(filePath);
+            Workbook workbook = new XSSFWorkbook(fileInputStream);
+            Sheet sheet = workbook.getSheetAt(0); // Assuming the data is in the first sheet
+
+            int lastRowNum = sheet.getLastRowNum();
+            int lastID = 0;
+
+            for (int i = lastRowNum; i >= 0; i--) {
+                Row row = sheet.getRow(i);
+                if (row != null) {
+                    Cell cell = row.getCell(0);
+                    if (cell != null && cell.getCellType() == CellType.NUMERIC) {
+                        double cellValue = cell.getNumericCellValue();
+                        int intValue = (int) cellValue;
+                        lastID = intValue;
+                        break;
+                    }
+                }
+            }
+
+            System.out.println("Last ID number: " + lastID);
+            for (List<Object> rowData : newData) {
+                Row row = sheet.createRow(++lastID);
+                int colCount = 0;
+                List<Object> newRowData = new ArrayList<>();
+                newRowData.add(lastID);
+                for (Object data : rowData){
+                    newRowData.add(data);
+                }
+                System.out.println(newRowData);
+                for (Object field : newRowData) {
+                    Cell cell = row.createCell(colCount++);
+                    if (field instanceof String) {
+                        cell.setCellValue((String) field);
+                    } else if (field instanceof Integer) {
+                        cell.setCellValue((Integer) field);
+                    } else if (field instanceof Double){
+                        cell.setCellValue((Double) field);
+                    }
+                }
+            }
+
+            FileOutputStream outputStream = new FileOutputStream(filePath);
+            workbook.write(outputStream);
+            workbook.close();
+            outputStream.close();
+            System.out.println("Data successfully appended to the local file.");
+        } catch (IOException e) {
+            System.err.println("Error occurred while appending data to the local file: " + e.getMessage());
+        }
+    }
+
+    public static void deleteRowById(String id, String filePath) {
+        try {
+            FileInputStream fileInputStream = new FileInputStream(filePath);
+            Workbook workbook = new XSSFWorkbook(fileInputStream);
+            Sheet sheet = workbook.getSheetAt(0); // Assuming the data is in the first sheet
+
+            int columnIndexToDelete = 0; // Assuming the identifier is in the first column
+            boolean flag = false;
+            for (int i = sheet.getLastRowNum(); i >= 0; i--) {
+                Row row = sheet.getRow(i);
+                if (row != null) {
+                    Cell cell = row.getCell(columnIndexToDelete);
+                    if (cell != null && cell.getCellType() == CellType.NUMERIC) {
+                        double cellValue = cell.getNumericCellValue();
+                        int intValue = (int) cellValue;
+                        if (intValue == Integer.parseInt(id)) {
+                            System.out.println("Found matching cell: " + cellValue);
+                            sheet.removeRow(row);
+                            flag = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            fileInputStream.close();
+            if (flag){
+                FileOutputStream outputStream = new FileOutputStream(filePath);
+                workbook.write(outputStream);
+                workbook.close();
+                outputStream.close();
+                System.out.println("Row with id " + id + " deleted from the local file.");
+            } else{
+                System.out.println("Row with id " + id + " not found in the local file.");
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error occurred while deleting row from the local file: " + e.getMessage());
+        }
+    }
+
+    public static void editDataInLocalFile(String id, List<Object> newData, String filePath) {
+        try {
+            FileInputStream fileInputStream = new FileInputStream(filePath);
+            Workbook workbook = new XSSFWorkbook(fileInputStream);
+            Sheet sheet = workbook.getSheetAt(0);
+            int columnIndexToUpdate = 0;
+            for (Row row : sheet) {
+                Cell cell = row.getCell(columnIndexToUpdate);
+                System.out.println(cell);
+                if (cell != null && cell.getCellType() == CellType.NUMERIC) {
+                    double cellValue = cell.getNumericCellValue();
+                    int intValue = (int) cellValue;
+                    if (intValue == Integer.parseInt(id)) {
+                        System.out.println("Found matching cell: " + cellValue);
+                        int colNum = 0;
+                        for (Object field : newData) {
+                            Cell existingCell = row.getCell(colNum);
+                            if (existingCell == null) {
+                                existingCell = row.createCell(colNum);
+                            }
+                            if (field instanceof String) {
+                                existingCell.setCellValue((String) field);
+                            } else if (field instanceof Integer) {
+                                existingCell.setCellValue((Integer) field);
+                            } else if (field instanceof Double) {
+                                existingCell.setCellValue((Double) field);
+                            }
+                            colNum++;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            fileInputStream.close(); // Close the input stream before writing to the file
+
+            // Update the existing FileOutputStream to overwrite the file
+            FileOutputStream outputStream = new FileOutputStream(filePath);
+            workbook.write(outputStream);
+            outputStream.flush();
+            outputStream.close();
+            workbook.close(); // Close the workbook after writing the changes
+
+            System.out.println("Data successfully updated in the local file.");
+        } catch (IOException e) {
+            System.err.println("Error occurred while updating data in the local file: " + e.getMessage());
+        }
+    }
+
 
     public static List<List<Object>> convertSheetToList(Sheet sheet) {
         List<List<Object>> data = new ArrayList<>();
@@ -578,7 +719,15 @@ public class SheetUtils {
                         rowData.add(cell.getStringCellValue());
                         break;
                     case NUMERIC:
-                        rowData.add(cell.getNumericCellValue());
+                        if (DateUtil.isCellDateFormatted(cell)) {
+                            rowData.add(cell.getDateCellValue());
+                        } else {
+                            if (cell.getNumericCellValue() == (int) cell.getNumericCellValue()) {
+                                rowData.add((int) cell.getNumericCellValue());
+                            } else {
+                                rowData.add(cell.getNumericCellValue());
+                            }
+                        }
                         break;
                     case BOOLEAN:
                         rowData.add(cell.getBooleanCellValue());

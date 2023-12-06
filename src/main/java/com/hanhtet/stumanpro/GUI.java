@@ -7,6 +7,8 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import com.hanhtet.stumanpro.utils.SyncManagerCustom;
+
 public class GUI extends Application {
     @Override
     public void start(Stage stage) throws IOException {
@@ -20,5 +22,15 @@ public class GUI extends Application {
         stage.setMaxHeight(400);
         stage.setScene(scene);
         stage.show();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                System.out.println("Auto Saving Mode!");
+                SyncManagerCustom.startAutoSync();
+                System.out.println("Done saving bye!");
+            } catch (Exception e) {
+               System.out.println("bye bye!");
+            }
+        }));
     }
 }

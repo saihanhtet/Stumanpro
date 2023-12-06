@@ -6,7 +6,7 @@ import java.util.ResourceBundle;
 
 import com.hanhtet.stumanpro.alert.CustomAlertBox;
 import com.hanhtet.stumanpro.utils.Functions;
-import com.hanhtet.stumanpro.utils.SheetUtils;
+import com.hanhtet.stumanpro.utils.SyncManagerCustom;
 import com.hanhtet.stumanpro.utils.UserSession;
 
 import javafx.collections.ObservableList;
@@ -21,7 +21,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -197,7 +196,7 @@ public class MainWindow {
 
     @FXML
     void SyncFunction(ActionEvent event){
-        boolean result = functions.AutoSyncData();
+        boolean result = SyncManagerCustom.startAutoSync();
         if (!result){
             Node source = (Node) event.getSource();
             Stage primaryStage = (Stage) source.getScene().getWindow();
@@ -217,7 +216,17 @@ public class MainWindow {
         countStudentsTask.setOnSucceeded(e -> {
             student_count.setText(countStudentsTask.getValue().toString());
         });
+
         new Thread(countStudentsTask).start();
+
+        Task<Boolean> syncTask = new Task<>() {
+            @Override
+            protected Boolean call() throws Exception {
+                return SyncManagerCustom.startAutoSync();
+            }
+        };
+        
+        new Thread(syncTask).start();
     }
 
 

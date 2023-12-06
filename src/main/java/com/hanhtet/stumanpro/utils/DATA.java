@@ -10,5 +10,13 @@ public class DATA {
     public final static String APPLICATION_NAME = "Light English Class For All";
     public final static String TOKEN_PATH = "/.stumanpro/tokens";
     public final static String FILE_PATH = "/.stumanpro/tables";
-    public static final String GOOGLE_SHEETS_DIRECTORY = "/.stumanpro/sheetId";
+    public static final String GOOGLE_SHEETSDIRECTORY = "/.stumanpro/sheetId";
+    public static final String TOKENS_DIRECTORY_PATH;
+    public static final String GOOGLE_SHEETS_DIRECTORY;
+    public static final String DOWNLOAD_XLXS_FOLDER_PATH;
+    static {
+        TOKENS_DIRECTORY_PATH = System.getProperty("user.home") + DATA.TOKEN_PATH;
+        DOWNLOAD_XLXS_FOLDER_PATH = System.getProperty("user.home") + DATA.FILE_PATH;
+        GOOGLE_SHEETS_DIRECTORY = System.getProperty("user.home") + DATA.GOOGLE_SHEETSDIRECTORY;
+    }
 }

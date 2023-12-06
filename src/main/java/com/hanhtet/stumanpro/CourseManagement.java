@@ -97,14 +97,15 @@ public class CourseManagement {
 
     private void edit(Course course){
         List<Object> newData = new ArrayList<>();
-        newData.add(course.getId());
+        newData.add(Integer.parseInt(course.getId()));
         newData.add(course.getName());
-        newData.add(course.getPrice());
+        newData.add(Integer.parseInt(course.getPrice()));
         String updatedId = course.getId().toString();
         try {
-            SheetUtils.updateDataInSheet(updatedId, newData, DATA.COURSE_TABLE_ID, DATA.COURSE_TABLE_RANGE);
-        } catch (IOException | GeneralSecurityException e) {
-            System.err.println("Something went wrong with editing the course!");
+            SheetUtils.editDataInLocalFile(updatedId, newData, DATA.DOWNLOAD_XLXS_FOLDER_PATH +"\\"+"lcfa_courses.xlsx");
+            //SheetUtils.updateDataInSheet(updatedId, newData, DATA.COURSE_TABLE_ID, DATA.COURSE_TABLE_RANGE);
+        } catch (Exception e) {
+            System.err.println("Something went wrong with editing the course!"+e);
         }
     }
 
