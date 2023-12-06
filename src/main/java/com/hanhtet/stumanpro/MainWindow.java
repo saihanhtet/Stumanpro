@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import com.hanhtet.stumanpro.alert.CustomAlertBox;
+import com.hanhtet.stumanpro.utils.DATA;
 import com.hanhtet.stumanpro.utils.Functions;
 import com.hanhtet.stumanpro.utils.SyncManagerCustom;
 import com.hanhtet.stumanpro.utils.UserSession;
@@ -27,9 +28,12 @@ import javafx.stage.Stage;
 
 public class MainWindow {
     private final Functions functions = new Functions();
+    @FXML
+    private Label ApplicationLabel;
 
     @FXML
     private ResourceBundle resources;
+
     @FXML
     private Label student_count;
 
@@ -92,7 +96,7 @@ public class MainWindow {
             Stage stage = new Stage();
             Scene scene = new Scene(root);
             stage.setScene(scene);
-            stage.setTitle("Light English Class For All");
+            stage.setTitle(DATA.APPLICATION_NAME);
             stage.show();
             ((Node) event.getSource()).getScene().getWindow().hide();
         } catch (Exception e) {
@@ -130,9 +134,9 @@ public class MainWindow {
     }
 
     @FXML
-    void StudentInquire(ActionEvent event) {
+    void UserControl(ActionEvent event) {
         inquire_student_page.toFront();
-        route.setText("Dashboard/Inquire Students");
+        route.setText("Dashboard/User Control And Monitoring");
     }
 
     @FXML
@@ -233,6 +237,7 @@ public class MainWindow {
 
     @FXML
     void initialize() {
+        
         assert sidebar != null : "fx:id=\"sidebar\" was not injected: check your FXML file 'mainwindow.fxml'.";
         assert welcome_name != null : "fx:id=\"welcome_name\" was not injected: check your FXML file 'mainwindow.fxml'.";
         assert route != null : "fx:id=\"route\" was not injected: check your FXML file 'mainwindow.fxml'.";
@@ -241,11 +246,10 @@ public class MainWindow {
         assert student_management_page != null : "fx:id=\"student_management_page\" was not injected: check your FXML file 'mainwindow.fxml'.";
         assert inquire_student_page != null : "fx:id=\"inquire_student_page\" was not injected: check your FXML file 'mainwindow.fxml'.";
 
+        ApplicationLabel.setText(DATA.APPLICATION_NAME);
         UserSession userSession = UserSession.getInstance();
         String name = userSession.getName();
         welcome_name.setText("Welcome back "+name+"!");
         autoFetch();
-
-        functions.InitializeProject();
     }
 }

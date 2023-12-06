@@ -11,13 +11,24 @@ public class SyncManagerCustom {
                 Map<String, String> spreadsheetId = SheetUtils.readSpreadsheetInfoFromFile();
                 SheetUtils.syncWithLocalSheet("lcfa_users",spreadsheetId.get("lcfa_users"), DATA.USER_TABLE_RANGE);
                 SheetUtils.syncWithLocalSheet("lcfa_courses",spreadsheetId.get("lcfa_courses"), DATA.COURSE_TABLE_RANGE);
-                return true;
             } catch (Exception e) {
-                return false;
+                System.err.println("Error at syncing offline");
             }
-        }else{
-            return false;
         }
+        return isInternet;
+    }
+
+    public static boolean SyncFromOnline(){
+        boolean isInternet = InternetConnectionChecker.isInternetAvailable();
+        if (isInternet){
+            try{
+                Functions functions = new Functions();
+                functions.downloadAll();
+            } catch (Exception e){
+                System.err.println("Error at syncing online");
+            }
+        }
+        return isInternet;
     }
 
     public static boolean startAutoSync(){

@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 
 import com.hanhtet.stumanpro.alert.CustomAlertBox;
 import com.hanhtet.stumanpro.entity.Login;
+import com.hanhtet.stumanpro.utils.DATA;
 import com.hanhtet.stumanpro.utils.Functions;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,11 +15,15 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class LoginController {
+
+    @FXML
+    private Label ApplicationLabel;
 
     @FXML
     private ResourceBundle resources;
@@ -37,8 +42,8 @@ public class LoginController {
 
     @FXML
     private void LoginFunction(ActionEvent event) {
-        //Login user = new Login(Email_input.getText(), Password_input.getText());
-        Login user = new Login("hanhtetsan13@gmail.com", "P@ssw0rd2006");
+        Login user = new Login(Email_input.getText(), Password_input.getText());
+        //Login user = new Login("hanhtetsan13@gmail.com", "P@ssw0rd2006");
         boolean result = functions.LoginUser(user);
         if (result){
             try {
@@ -47,7 +52,7 @@ public class LoginController {
                 Stage stage = new Stage();
                 Scene scene = new Scene(root);
                 stage.setScene(scene);
-                stage.setTitle("Light English Class For All");
+                stage.setTitle(DATA.APPLICATION_NAME);
                 stage.show();
                 ((Node) event.getSource()).getScene().getWindow().hide();
             } catch (IOException e) {
@@ -79,8 +84,10 @@ public class LoginController {
 
     @FXML
     private void initialize() {
+        ApplicationLabel.setText(DATA.APPLICATION_NAME);
         assert Email_input != null : "fx:id=\"Email_input\" was not injected: check your FXML file 'Login.fxml'.";
         assert Password_input != null : "fx:id=\"Password_input\" was not injected: check your FXML file 'Login.fxml'.";
         functions = new Functions();
+        functions.InitializeProject();
     }
 }

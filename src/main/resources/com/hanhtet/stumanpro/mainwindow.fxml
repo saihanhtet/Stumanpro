@@ -37,7 +37,7 @@
                         <FontAwesomeIcon glyphName="HOME" size="1.4em" styleClass="svg" />
                     </graphic>
                 </Button>
-                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#StudentInquire" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Inquire Student" textOverrun="CLIP">
+                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#UserControl" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="User Control" textOverrun="CLIP">
                     <cursor>
                         <Cursor fx:constant="HAND" />
                     </cursor>
@@ -105,7 +105,7 @@
                     <HBox.margin>
                         <Insets />
                     </HBox.margin>
-                    <Label prefHeight="28.0" prefWidth="250.0" styleClass="brand" text="Light English Class For All" HBox.hgrow="ALWAYS">
+                    <Label fx:id="ApplicationLabel" prefHeight="28.0" prefWidth="250.0" styleClass="brand" text="Light English Class For All" HBox.hgrow="ALWAYS">
                         <padding>
                             <Insets left="10.0" />
                         </padding>

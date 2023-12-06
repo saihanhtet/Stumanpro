@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import com.hanhtet.stumanpro.utils.DATA;
 import com.hanhtet.stumanpro.utils.SyncManagerCustom;
 
 public class GUI extends Application {
@@ -14,7 +15,7 @@ public class GUI extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("Login.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 360);
-        stage.setTitle("Light English Class For All");
+        stage.setTitle(DATA.APPLICATION_NAME);
         stage.setResizable(false);
         stage.setMinWidth(600);
         stage.setMinHeight(400);

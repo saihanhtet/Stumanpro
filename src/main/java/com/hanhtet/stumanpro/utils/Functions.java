@@ -16,20 +16,20 @@ import com.hanhtet.stumanpro.entity.User;
 
 public class Functions {
     private static final Logger LOGGER = Logger.getLogger(DATA.APPLICATION_NAME);
-    
+    private static Map<String, String> SPREADSHEET_ID;
     
     public boolean RegisterUser(User user){
         try {
+            user.setPassword("LightClassForAll");
             List<Object> userData = user.getAllDataAsList();
-            boolean result = addData(userData, DATA.USER_TABLE_ID, DATA.USER_TABLE_RANGE);
+            boolean result = addData(userData, SPREADSHEET_ID.get("lcfa_users"), DATA.USER_TABLE_RANGE, "lcfa_users");
             if (result){
                 System.out.println("Added USER: " + user.getName());
-                return result;
             }
             else{
                 System.err.println("Error occurred at adding USER.");
-                return false;
             }
+            return result;
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "An error occurred while appending data to the sheet", e);
             System.err.println("An error occurred while appending data to the sheet.");
@@ -39,7 +39,7 @@ public class Functions {
 
     public boolean LoginUser(Login user){
         try {
-            List<List<Object>> existingData = SheetUtils.readFromSheet(DATA.USER_TABLE_ID, DATA.USER_TABLE_RANGE);
+            List<List<Object>> existingData = SheetUtils.readFromSheet(SPREADSHEET_ID.get("lcfa_users"), DATA.USER_TABLE_RANGE);
             if (existingData != null && !existingData.isEmpty()) {
                 for (List<Object> row : existingData) {
                     if (row.size() >= 3) {
@@ -77,7 +77,7 @@ public class Functions {
     public Integer count_user(String userType){
         int count = 0;
         try{
-            List<List<Object>> existingData = SheetUtils.readFromSheet(DATA.USER_TABLE_ID, DATA.USER_TABLE_RANGE);
+            List<List<Object>> existingData = SheetUtils.readFromSheet(SPREADSHEET_ID.get("lcfa_users"), DATA.USER_TABLE_RANGE);
             if (existingData != null && !existingData.isEmpty()) {
                 for (List<Object> row : existingData) {
                     if (row.get(8).toString().equals(userType)){
@@ -93,7 +93,7 @@ public class Functions {
 
     public boolean addCourse(Course course){
         List<Object> courseData = course.getAllDataAsList();
-        boolean result = addData(courseData, DATA.COURSE_TABLE_ID, DATA.COURSE_TABLE_RANGE);
+        boolean result = addData(courseData, SPREADSHEET_ID.get("lcfa_courses"), DATA.COURSE_TABLE_RANGE,"lcfa_courses");
         if (result){
             System.out.println("Added Course: " + course.getName());
         }
@@ -103,7 +103,7 @@ public class Functions {
         return result;
     }
 
-    public boolean addData(List<Object> newRow, String table_id, String table_range){
+    public boolean addData(List<Object> newRow, String table_id, String table_range, String filename){
         List<List<Object>> existingData;
         try {
             existingData = SheetUtils.readFromSheet(table_id, table_range);
@@ -124,10 +124,13 @@ public class Functions {
         }
         List<List<Object>> newData = new ArrayList<>();
         newData.add(newRow);
-        System.out.println(existingData +"|"+ newRow);
         try {
-            SheetUtils.appendDataToLocalFile(newData, DATA.DOWNLOAD_XLXS_FOLDER_PATH+"\\"+"lcfa_courses.xlsx");
-            //SheetUtils.appendDataToSheet(newData, table_id, table_range);
+            SheetUtils.appendDataToLocalFile(newData, DATA.DOWNLOAD_XLXS_FOLDER_PATH+"\\"+filename+".xlsx");
+            if (InternetConnectionChecker.isInternetAvailable()){
+                SheetUtils.appendDataToSheet(newData, table_id, table_range);
+            }else{
+                System.out.println("No internet available to save the data on cloud!");
+            }
             System.out.println("Data added successfully to the sheet!");
             return true;
         } catch (Exception e) {
@@ -151,7 +154,7 @@ public class Functions {
     }
 
     public void download_course(){
-        SheetUtils.downloadFile("course",DATA.COURSE_TABLE_ID, DATA.COURSE_TABLE_RANGE);
+        SheetUtils.downloadFile("course",SPREADSHEET_ID.get("lcfa_courses"), DATA.COURSE_TABLE_RANGE);
     }
 
 	public List<Course> getCoursesFromSheet() {
@@ -193,6 +196,7 @@ public class Functions {
             spreadsheetId.put("lcfa_users", lcfa_users);
             spreadsheetId.put("lcfa_courses", lcfa_courses);
             SheetUtils.writeSpreadsheetInfoToFile(spreadsheetId);
+            SPREADSHEET_ID = SheetUtils.readSpreadsheetInfoFromFile();
 
             List<Object> userHeaderData = new ArrayList<>(List.of(
                 "id", "firstname", "lastname", "email", 
@@ -208,18 +212,22 @@ public class Functions {
             } catch (IOException e) {
                 System.err.println("Error at adding header!");
             }
-
+            
             SheetUtils.downloadFile("lcfa_users", lcfa_users, DATA.USER_TABLE_RANGE);
             SheetUtils.downloadFile("lcfa_courses", lcfa_courses, DATA.COURSE_TABLE_RANGE);
             SetupUtils.storeSetupCompletionFlag(true);
 
+            User default_user = new User("admin", "admin", "admin@gmail.com", "admin2023", "09999999", "null", "home", "admin");
+            RegisterUser(default_user);
         } else{
             System.out.println("Google Sheets or local files already exist. Skipping setup.");
-            Map<String, String> spreadsheetId = SheetUtils.readSpreadsheetInfoFromFile();
-
-            System.out.println(spreadsheetId.get("lcfa_users"));
-            System.out.println(spreadsheetId.get("lcfa_courses"));
+            SPREADSHEET_ID = SheetUtils.readSpreadsheetInfoFromFile();
         }
+    }
+
+    public void downloadAll(){
+        SheetUtils.downloadFile("lcfa_users", SPREADSHEET_ID.get("lcfa_users"), DATA.USER_TABLE_RANGE);
+        SheetUtils.downloadFile("lcfa_courses", SPREADSHEET_ID.get("lcfa_courses"), DATA.COURSE_TABLE_RANGE);
     }
     
 }

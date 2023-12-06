@@ -192,7 +192,6 @@ public class SheetUtils {
                 String endColumn = cellRange.substring(colonIndex + 1);
                 result.put(0,sheetName);
                 result.put(1,sheetName + "!A1:" + endColumn);
-                System.out.println(result+"--");
                 return result;
             }
         }
@@ -271,13 +270,11 @@ public class SheetUtils {
     
         List<Object> newRow = new ArrayList<>();
         for (List<Object> dataRow: newData){
-            System.out.println(dataRow);
             newRow.add(Integer.toString(newId));
             for (Object data : dataRow){
                 newRow.add(data);
             }
         }
-        
         
         String rangeForAppend = range.substring(0, range.indexOf('!') + 1) + "A" + (lastRowIndex + 2) + ":H";
         ValueRange body = new ValueRange().setValues(Collections.singletonList(newRow));
@@ -483,7 +480,7 @@ public class SheetUtils {
             
             List<List<Object>> localData = readLocalFile(filePath);
             if (!newData.equals(localData)) {   
-                updateGoogleSheet(localData, tableId, tableRange);// Update google sheet file with local data
+                updateGoogleSheet(localData, tableId, tableRange);
                 System.out.println("Google Sheet file updated successfully.");
             } else {
                 System.out.println("Google Sheet file is already up-to-date.");
@@ -660,7 +657,6 @@ public class SheetUtils {
             int columnIndexToUpdate = 0;
             for (Row row : sheet) {
                 Cell cell = row.getCell(columnIndexToUpdate);
-                System.out.println(cell);
                 if (cell != null && cell.getCellType() == CellType.NUMERIC) {
                     double cellValue = cell.getNumericCellValue();
                     int intValue = (int) cellValue;
