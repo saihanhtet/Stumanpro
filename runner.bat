@@ -1,1 +1,8 @@
-c:; cd 'c:\Users\hanhtet\Documents\Java-workspace\Stumanpro'; & 'C:\Program Files\Java\jdk-19.0.2\bin\java.exe' '@C:\Users\hanhtet\AppData\Local\Temp\cp_dnnb0xqd2che448rxyf718rfd.argfile' 'com.hanhtet.stumanpro.MainApplication'
+@echo off
+cd "C:\Users\hanht\Documents\Stumanpro"
+
+REM Run the Java application with specified parameters
+"C:\workLibrary\jdks\jdk-19.0.2\bin\java.exe" --module-path "C:\workLibrary\jdks\javafx-sdk-19.0.2\lib" --add-modules javafx.controls,javafx.fxml,java.logging,java.naming,jdk.httpserver,jdk.crypto.ec -cp "build\classes\java\main\com\hanhtet\stumanpro" com.hanhtet.stumanpro.MainApplication
+
+REM Pause to see output (optional)
+pause

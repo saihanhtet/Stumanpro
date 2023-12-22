@@ -23,7 +23,7 @@ import javafx.stage.Stage;
 public class LoginController {
 
     @FXML
-    private Label ApplicationLabel;
+    private Label applicationLabel;
 
     @FXML
     private ResourceBundle resources;
@@ -32,33 +32,37 @@ public class LoginController {
     private URL location;
 
     @FXML
-    private TextField Email_input;
+    private TextField emailInput;
 
     @FXML
-    private PasswordField Password_input;
+    private PasswordField passwordInput;
 
 
     private Functions functions;
 
     @FXML
-    private void LoginFunction(ActionEvent event) {
-        Login user = new Login(Email_input.getText(), Password_input.getText());
-        //Login user = new Login("hanhtetsan13@gmail.com", "P@ssw0rd2006");
+    private void loginFunction(ActionEvent event) {
+        // Login user = new Login(emailInput.getText(), passwordInput.getText());
+        Login user = new Login("admin@gmail.com", "admin2023");
         boolean result = functions.LoginUser(user);
         if (result){
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("mainwindow.fxml"));
-                Parent root = loader.load();
-                Stage stage = new Stage();
-                Scene scene = new Scene(root);
-                stage.setScene(scene);
-                stage.setTitle(DATA.APPLICATION_NAME);
-                stage.show();
-                ((Node) event.getSource()).getScene().getWindow().hide();
-            } catch (IOException e) {
-                Node source = (Node) event.getSource();
-                Stage primaryStage = (Stage) source.getScene().getWindow();
-                CustomAlertBox.showAlert(Alert.AlertType.INFORMATION, primaryStage, "File Not existed", "The MainWindow Not Existed!", "MainWindow does not existed maybe it lost in compiling?");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(DATA.MAINWINDOW_FXML));
+            if (loader != null) {
+                try {
+                    Parent root = loader.load();
+                    Stage stage = new Stage();
+                    Scene scene = new Scene(root);
+                    stage.setScene(scene);
+                    stage.setTitle(DATA.APPLICATION_NAME);
+                    stage.show();
+                    ((Node) event.getSource()).getScene().getWindow().hide();
+                } catch (IOException e) {
+                    Node source = (Node) event.getSource();
+                    Stage primaryStage = (Stage) source.getScene().getWindow();
+                    CustomAlertBox.showAlert(Alert.AlertType.INFORMATION, primaryStage, "File Not existed", "The MainWindow Not Existed!", "MainWindow does not existed maybe it lost in compiling?");
+                }
+            } else {
+                System.out.println("FXML file not found!");
             }
         } else {
             Node source = (Node) event.getSource();
@@ -69,14 +73,14 @@ public class LoginController {
     }
 
     @FXML
-    private void dont_have_account(ActionEvent event) {
+    private void dontHaveAccount(ActionEvent event) {
         Node source = (Node) event.getSource();
         Stage primaryStage = (Stage) source.getScene().getWindow();
         CustomAlertBox.showAlert(Alert.AlertType.INFORMATION, primaryStage, "New User", "User Registration!", "Please contact us lightecfa@gmail.com");
     }
 
     @FXML
-    private void forgot_password(ActionEvent event) {
+    private void forgotPassword(ActionEvent event) {
         Node source = (Node) event.getSource();
         Stage primaryStage = (Stage) source.getScene().getWindow();
         CustomAlertBox.showAlert(Alert.AlertType.INFORMATION, primaryStage, "Forgot Password?", "Forgot Password?", "Please contact us lightecfa@gmail.com");
@@ -84,9 +88,9 @@ public class LoginController {
 
     @FXML
     private void initialize() {
-        ApplicationLabel.setText(DATA.APPLICATION_NAME);
-        assert Email_input != null : "fx:id=\"Email_input\" was not injected: check your FXML file 'Login.fxml'.";
-        assert Password_input != null : "fx:id=\"Password_input\" was not injected: check your FXML file 'Login.fxml'.";
+        applicationLabel.setText(DATA.APPLICATION_NAME);
+        assert emailInput != null : "fx:id=\"emailInput\" was not injected: check your FXML file 'Login.fxml'.";
+        assert passwordInput != null : "fx:id=\"passwordInput\" was not injected: check your FXML file 'Login.fxml'.";
         functions = new Functions();
         functions.InitializeProject();
     }

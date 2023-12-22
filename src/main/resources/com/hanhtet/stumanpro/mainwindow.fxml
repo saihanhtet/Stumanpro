@@ -19,7 +19,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="700.0" prefWidth="1200.0" styleClass="dashboard" stylesheets="@themes/style.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hanhtet.stumanpro.MainWindow">
+<AnchorPane prefHeight="700.0" prefWidth="1200.0" styleClass="dashboard" stylesheets="@themes/style.css"
+    xmlns="http://javafx.com/javafx/8.0.171"
+    xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hanhtet.stumanpro.MainWindowController">
     <BorderPane layoutX="-31.0" layoutY="25.0" prefHeight="394.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <left>
             <VBox fx:id="sidebar" alignment="TOP_CENTER" minWidth="80.0" prefHeight="200.0" prefWidth="240.0" spacing="20.0" styleClass="sidebar" BorderPane.alignment="CENTER_LEFT">
@@ -29,7 +31,7 @@
                 <padding>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </padding>
-                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#HomePage" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="HOME" textOverrun="CLIP">
+                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#homePageFunction" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="HOME" textOverrun="CLIP">
                     <cursor>
                         <Cursor fx:constant="HAND" />
                     </cursor>
@@ -37,7 +39,7 @@
                         <FontAwesomeIcon glyphName="HOME" size="1.4em" styleClass="svg" />
                     </graphic>
                 </Button>
-                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#UserControl" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="User Control" textOverrun="CLIP">
+                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#studentManagementPageFunction" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Student ManagementPageFunction" textOverrun="CLIP">
                     <cursor>
                         <Cursor fx:constant="HAND" />
                     </cursor>
@@ -45,7 +47,7 @@
                         <FontAwesomeIcon glyphName="USER" size="1.4em" styleClass="svg" />
                     </graphic>
                 </Button>
-                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#StudentManagement" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Management" textOverrun="CLIP">
+                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#managementPageFunction" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Management" textOverrun="CLIP">
                     <cursor>
                         <Cursor fx:constant="HAND" />
                     </cursor>
@@ -53,7 +55,7 @@
                         <FontAwesomeIcon glyphName="USERS" size="1.4em" styleClass="svg" />
                     </graphic>
                 </Button>
-                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#Budget" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Budget" textOverrun="CLIP">
+                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#budgetFunction" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Budget" textOverrun="CLIP">
                     <cursor>
                         <Cursor fx:constant="HAND" />
                     </cursor>
@@ -61,7 +63,7 @@
                         <FontAwesomeIcon glyphName="MONEY" size="1.4em" styleClass="svg" />
                     </graphic>
                 </Button>
-                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#AnalyticPage" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Analytics" textOverrun="CLIP">
+                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#analyticPageFunction" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Analytics" textOverrun="CLIP">
                     <cursor>
                         <Cursor fx:constant="HAND" />
                     </cursor>
@@ -69,7 +71,7 @@
                         <FontAwesomeIcon glyphName="PIE_CHART" size="1.4em" styleClass="svg" />
                     </graphic>
                 </Button>
-                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#ExamPage" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Exams" textOverrun="CLIP">
+                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#examPageFunction" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Exams" textOverrun="CLIP">
                     <cursor>
                         <Cursor fx:constant="HAND" />
                     </cursor>
@@ -77,7 +79,7 @@
                         <FontAwesomeIcon glyphName="UNIVERSITY" size="1.4em" styleClass="svg" />
                     </graphic>
                 </Button>
-                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#HomeworkPage" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Homeworks" textOverrun="CLIP">
+                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#homeworkPageFunction" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Homeworks" textOverrun="CLIP">
                     <cursor>
                         <Cursor fx:constant="HAND" />
                     </cursor>
@@ -86,7 +88,7 @@
                     </graphic>
                 </Button>
                 <Separator opacity="0.0" orientation="VERTICAL" prefHeight="200.0" VBox.vgrow="ALWAYS" />
-                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#LogoutPage" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Logout" textOverrun="CLIP">
+                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#logoutPageFunction" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Logout" textOverrun="CLIP">
                     <cursor>
                         <Cursor fx:constant="HAND" />
                     </cursor>
@@ -105,12 +107,12 @@
                     <HBox.margin>
                         <Insets />
                     </HBox.margin>
-                    <Label fx:id="ApplicationLabel" prefHeight="28.0" prefWidth="250.0" styleClass="brand" text="Light English Class For All" HBox.hgrow="ALWAYS">
+                    <Label fx:id="applicationLabel" prefHeight="28.0" prefWidth="250.0" styleClass="brand" text="Light English Class For All" HBox.hgrow="ALWAYS">
                         <padding>
                             <Insets left="10.0" />
                         </padding>
                     </Label>
-                    <ToggleButton minWidth="42.0" mnemonicParsing="false" onAction="#SidebarToggle" prefHeight="38.0" prefWidth="42.0" styleClass="sidebar-btn">
+                    <ToggleButton minWidth="42.0" mnemonicParsing="false" onAction="#sidebarToggle" prefHeight="38.0" prefWidth="42.0" styleClass="sidebar-btn">
                         <graphic>
                             <FontAwesomeIcon glyphName="NAVICON" size="1.3em" styleClass="svg" />
                         </graphic>
@@ -120,27 +122,27 @@
                     </ToggleButton>
                 </HBox>
                 <VBox alignment="CENTER_LEFT" prefHeight="102.0" prefWidth="960.0" styleClass="welcome-txt" HBox.hgrow="ALWAYS">
-                    <Label fx:id="welcome_name" styleClass="Label" text="Welcome back Admin user " />
+                    <Label fx:id="welcomeName" styleClass="Label" text="Welcome back Admin user " />
                     <Label fx:id="route" styleClass="beamcumb" text="Dashboard/Home" />
                 </VBox>
                 <Separator opacity="0.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                 <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" HBox.hgrow="NEVER">
-                    <Button mnemonicParsing="false" onAction="#SyncFunction" styleClass="sidebar-btn" textOverrun="CLIP">
+                    <Button mnemonicParsing="false" onAction="#syncFunction" styleClass="sidebar-btn" textOverrun="CLIP">
                         <graphic>
                             <FontAwesomeIcon glyphName="REFRESH" size="1.3em" styleClass="svg" />
                         </graphic>
                     </Button>
-               <Button mnemonicParsing="false" styleClass="sidebar-btn" textOverrun="CLIP">
-                  <graphic>
-                     <FontAwesomeIcon glyphName="GEAR" size="1.3em" styleClass="svg" />
-                  </graphic>
-               </Button>
+                    <Button mnemonicParsing="false" styleClass="sidebar-btn" textOverrun="CLIP">
+                        <graphic>
+                            <FontAwesomeIcon glyphName="GEAR" size="1.3em" styleClass="svg" />
+                        </graphic>
+                    </Button>
                 </HBox>
             </HBox>
         </top>
         <center>
             <StackPane alignment="TOP_LEFT" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                <GridPane fx:id="inquire_student_page" style="-fx-padding: 10;" styleClass="bg">
+                <GridPane fx:id="studentManagePage" style="-fx-padding: 10;" styleClass="bg">
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -171,7 +173,7 @@
                         </columnResizePolicy>
                     </TableView>
                 </GridPane>
-                <GridPane fx:id="home_page" styleClass="bg">
+                <GridPane fx:id="homePage" styleClass="bg">
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
@@ -189,7 +191,7 @@
                                 <FontAwesomeIcon glyphName="USERS" size="2em" styleClass="svg" />
                                 <Label styleClass="Label" text="Total Students" />
                             </HBox>
-                            <Label fx:id="student_count" styleClass="Label" text="1000" />
+                            <Label fx:id="studentCount" styleClass="Label" text="1000" />
                         </VBox>
                         <VBox alignment="CENTER" styleClass="status-card" HBox.hgrow="ALWAYS">
                             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" HBox.hgrow="ALWAYS">
@@ -207,7 +209,7 @@
                         </VBox>
                     </HBox>
                     <HBox prefHeight="100.0" prefWidth="200.0" style="-fx-padding: 10;" styleClass="bg" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
-                        <TableView fx:id="FrontTableView" prefHeight="374.0" prefWidth="338.0">
+                        <TableView fx:id="frontTableView" prefHeight="374.0" prefWidth="338.0">
                             <columns>
                                 <TableColumn editable="false" prefWidth="75.0" text="Name" />
                                 <TableColumn editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" sortable="false" text="Sex" />
@@ -219,32 +221,32 @@
                         </TableView>
                     </HBox>
                 </GridPane>
-                <GridPane fx:id="student_management_page" style="-fx-padding: 10;" styleClass="bg">
+                <GridPane fx:id="managementPage" style="-fx-padding: 10;" styleClass="bg">
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                     </columnConstraints>
                     <rowConstraints>
                         <RowConstraints maxHeight="120.0" minHeight="120.0" prefHeight="120.0" vgrow="NEVER" />
-                  <RowConstraints maxHeight="120.0" minHeight="120.0" prefHeight="120.0" vgrow="NEVER" />
+                        <RowConstraints maxHeight="120.0" minHeight="120.0" prefHeight="120.0" vgrow="NEVER" />
                         <RowConstraints maxHeight="505.0" minHeight="10.0" prefHeight="476.0" vgrow="ALWAYS" />
                     </rowConstraints>
-               <VBox alignment="TOP_CENTER" prefHeight="521.0" prefWidth="470.0" styleClass="student_manage_options">
-                  <children>
-                     <Label alignment="CENTER" prefHeight="17.0" prefWidth="500.0" styleClass="Label" text="Student Management" VBox.vgrow="ALWAYS" />
-                     <HBox prefHeight="27.0" prefWidth="920.0" spacing="10.0" VBox.vgrow="NEVER">
-                        <children>
-                           <Button mnemonicParsing="false" onAction="#UserRegistration" prefHeight="25.0" prefWidth="500.0" text="Registration" />
-                           <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="500.0" text="Update" />
-                           <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="500.0" text="Delete" />
-                        </children>
-                     </HBox>
-                  </children>
-               </VBox>
+                    <VBox alignment="TOP_CENTER" prefHeight="521.0" prefWidth="470.0"
+                          styleClass="student_manage_options">
+                        <Label alignment="CENTER" prefHeight="17.0" prefWidth="500.0" styleClass="Label"
+                               text="User Management" VBox.vgrow="ALWAYS"/>
+                        <HBox prefHeight="27.0" prefWidth="920.0" spacing="10.0" VBox.vgrow="NEVER">
+                            <Button mnemonicParsing="false" onAction="#userRegistration" prefHeight="25.0"
+                                    prefWidth="500.0" text="Registration"/>
+                            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="500.0" text="View Users"/>
+                            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="500.0"
+                                    text="Delete Users"/>
+                        </HBox>
+                    </VBox>
                     <VBox alignment="TOP_CENTER" prefHeight="521.0" prefWidth="470.0" styleClass="student_manage_options" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
                         <Label alignment="CENTER" prefHeight="17.0" prefWidth="500.0" styleClass="Label" text="Course Management" VBox.vgrow="ALWAYS" />
                         <HBox prefHeight="27.0" prefWidth="920.0" spacing="10.0" VBox.vgrow="NEVER">
                             <Button mnemonicParsing="false" onAction="#addCourse" prefHeight="25.0" prefWidth="500.0" text="ADD Course" />
-                     <Button mnemonicParsing="false" onAction="#viewCourses" prefHeight="25.0" prefWidth="500.0" text="View Course" />
+                            <Button mnemonicParsing="false" onAction="#viewCourses" prefHeight="25.0" prefWidth="500.0" text="View Course" />
                             <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="500.0" text="Delete Course" />
                         </HBox>
                     </VBox>

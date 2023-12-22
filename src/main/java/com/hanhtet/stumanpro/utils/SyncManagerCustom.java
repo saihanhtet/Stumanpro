@@ -8,9 +8,9 @@ public class SyncManagerCustom {
         boolean isInternet = InternetConnectionChecker.isInternetAvailable();
         if (isInternet){
             try {
-                Map<String, String> spreadsheetId = SheetUtils.readSpreadsheetInfoFromFile();
-                SheetUtils.syncWithLocalSheet("lcfa_users",spreadsheetId.get("lcfa_users"), DATA.USER_TABLE_RANGE);
-                SheetUtils.syncWithLocalSheet("lcfa_courses",spreadsheetId.get("lcfa_courses"), DATA.COURSE_TABLE_RANGE);
+                Map<String, String> spreadsheetId = OnSheetWriter.readSpreadsheetInfoFromFile();
+                OnSheetWriter.syncWithLocalSheet("lcfa_users",spreadsheetId.get("lcfa_users"), DATA.USER_TABLE_RANGE);
+                OnSheetWriter.syncWithLocalSheet("lcfa_courses",spreadsheetId.get("lcfa_courses"), DATA.COURSE_TABLE_RANGE);
             } catch (Exception e) {
                 System.err.println("Error at syncing offline");
             }

@@ -22,7 +22,7 @@
                 <Insets top="10.0" />
             </VBox.margin>
             <Separator opacity="0.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-            <Label fx:id="ApplicationLabel" minWidth="-Infinity" styleClass="login_title" text="Light English Class For All" />
+            <Label fx:id="applicationLabel" minWidth="-Infinity" styleClass="login_title" text="Light English Class For All" />
             <Separator opacity="0.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
         </HBox>
         <VBox prefHeight="57.0" prefWidth="600.0" VBox.vgrow="NEVER">
@@ -34,7 +34,7 @@
                     <Insets left="10.0" right="10.0" top="10.0" />
                 </VBox.margin>
             </Label>
-            <TextField fx:id="Email_input" cache="true" styleClass="login_input" VBox.vgrow="NEVER">
+            <TextField fx:id="emailInput" cache="true" styleClass="login_input" VBox.vgrow="NEVER">
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
                 </VBox.margin>
@@ -52,7 +52,7 @@
                     <Insets left="10.0" right="10.0" top="10.0" />
                 </VBox.margin>
             </Label>
-            <PasswordField fx:id="Password_input" onAction="#LoginFunction" styleClass="login_input" VBox.vgrow="NEVER">
+            <PasswordField fx:id="passwordInput" onAction="#loginFunction" styleClass="login_input" VBox.vgrow="NEVER">
                 <VBox.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
                 </VBox.margin>
@@ -65,16 +65,16 @@
             <padding>
                 <Insets left="60.0" right="60.0" />
             </padding>
-            <Hyperlink onAction="#forgot_password" styleClass="link" text="Forgot Password?" />
+            <Hyperlink onAction="#forgotPassword" styleClass="link" text="Forgot Password?" />
             <Separator opacity="0.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-            <Hyperlink onAction="#dont_have_account" styleClass="link" text="Don't have an account?" />
+            <Hyperlink onAction="#dontHaveAccount" styleClass="link" text="Don't have an account?" />
         </HBox>
         <HBox prefHeight="42.0" prefWidth="600.0">
             <padding>
                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
             </padding>
             <Separator opacity="0.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" onAction="#LoginFunction" prefHeight="29.0" prefWidth="339.0" styleClass="login_btn" text="Login" HBox.hgrow="ALWAYS">
+            <Button mnemonicParsing="false" onAction="#loginFunction" prefHeight="29.0" prefWidth="339.0" styleClass="login_btn" text="Login" HBox.hgrow="ALWAYS">
                 <padding>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </padding>

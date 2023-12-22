@@ -25,37 +25,35 @@ import javafx.stage.Stage;
 public class CourseManagement {
     private final Functions functions = new Functions();
     @FXML
-    private TableColumn<Course, String> course_name;
+    private TableColumn<Course, String> courseName;
     @FXML
-    private TableColumn<Course, String> course_per_price; 
+    private TableColumn<Course, String> coursePerPrice; 
     @FXML
     private ResourceBundle resources;
 
     @FXML
     private URL location;
     @FXML
-    private TableColumn<Course, String> course_id;
+    private TableColumn<Course, String> courseID;
 
     @FXML
-    private TextField course_input;
+    private TextField courseInput;
     @FXML
-    private TextField course_price;
+    private TextField coursePrice;
 
     @FXML
-    private TableView<Course> course_table;
+    private TableView<Course> courseTable;
 
 
     @FXML
-    void ADDCourse(ActionEvent event) {
-        String courseName = course_input.getText();
-        String price = course_price.getText().toString();
-        Course course = new Course(null,courseName,price);
+    private void addCourse(ActionEvent event) {
+        String courseInputName = courseInput.getText();
+        String price = coursePrice.getText();
+        Course course = new Course(null,courseInputName,price);
         boolean result = functions.addCourse(course);
         if (result){
-            URL soundUrl = getClass().getResource(DATA.SUCCESS_SOUND);
-            functions.playAudio(soundUrl);
-            course_input.clear();
-            course_price.clear();
+            courseInput.clear();
+            coursePrice.clear();
         }else{
             Node source = (Node) event.getSource();
             Stage primaryStage = (Stage) source.getScene().getWindow();
@@ -63,33 +61,33 @@ public class CourseManagement {
         }
     }
 
-    public void addDataTable(){
+    private void addDataTable(){
         List<Course> coursesFromSheet = functions.getCoursesFromSheet();
         if (coursesFromSheet != null && !coursesFromSheet.isEmpty()) {
-            course_table.getItems().clear();
-            course_table.getItems().addAll(coursesFromSheet);
+            courseTable.getItems().clear();
+            courseTable.getItems().addAll(coursesFromSheet);
             setCellFactoryForColumns();
         }
     }
     private void setCellFactoryForColumns() {
-        course_name.setCellFactory(TextFieldTableCell.forTableColumn());
-        course_per_price.setCellFactory(TextFieldTableCell.forTableColumn());
+        courseName.setCellFactory(TextFieldTableCell.forTableColumn());
+        coursePerPrice.setCellFactory(TextFieldTableCell.forTableColumn());
 
-        course_name.setOnEditCommit(event -> {
+        courseName.setOnEditCommit(event -> {
             Course course = event.getRowValue();
             course.setName(event.getNewValue());
-            course_table.getItems().set(event.getTablePosition().getRow(), course);
+            courseTable.getItems().set(event.getTablePosition().getRow(), course);
             edit(course);
         });
-        course_per_price.setOnEditCommit(event -> {
+        coursePerPrice.setOnEditCommit(event -> {
             Course course = event.getRowValue();
             course.setPrice(event.getNewValue());
-            course_table.getItems().set(event.getTablePosition().getRow(), course);
+            courseTable.getItems().set(event.getTablePosition().getRow(), course);
             edit(course);
         });
 
-        course_name.setEditable(true);
-        course_per_price.setEditable(true);
+        courseName.setEditable(true);
+        coursePerPrice.setEditable(true);
     }
 
     private void edit(Course course){
@@ -100,19 +98,19 @@ public class CourseManagement {
         String updatedId = course.getId().toString();
         try {
             SheetUtils.editDataInLocalFile(updatedId, newData, DATA.DOWNLOAD_XLXS_FOLDER_PATH +"\\"+"lcfa_courses.xlsx");
-            //SheetUtils.updateDataInSheet(updatedId, newData, DATA.COURSE_TABLE_ID, DATA.COURSE_TABLE_RANGE);
+            //SheetUtils.updateDataInSheet(updatedId, newData, DATA.courseTable_ID, DATA.courseTable_RANGE);
         } catch (Exception e) {
             System.err.println("Something went wrong with editing the course!"+e);
         }
     }
 
     @FXML
-    void initialize() {
-        assert course_input != null : "fx:id=\"course_input\" was not injected: check your FXML file 'course_add.fxml'.";
+    private void initialize() {
+        assert courseInput != null : "fx:id=\"courseInput\" was not injected: check your FXML file 'course_add.fxml'.";
         try {
-            course_name.setCellValueFactory(new PropertyValueFactory<>("name"));
-            course_id.setCellValueFactory(new PropertyValueFactory<>("id"));
-            course_per_price.setCellValueFactory(new PropertyValueFactory<>("price"));
+            courseName.setCellValueFactory(new PropertyValueFactory<>("name"));
+            courseID.setCellValueFactory(new PropertyValueFactory<>("id"));
+            coursePerPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
             addDataTable();
         } catch (Exception e) {
             System.err.println(e);

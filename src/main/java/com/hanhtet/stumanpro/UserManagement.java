@@ -57,10 +57,10 @@ public class UserManagement {
         String address = (String) address_input.getText().toString();
         String user_type = user_type_input.getValue().toString().toLowerCase();
         User user = new User(firstName, lastName, email, passString, phString,"null",address,user_type);
-        boolean result = functions.RegisterUser(user);
+        boolean result = functions.RegisterUser(user, true);
         if (result){
-            URL soundUrl = getClass().getResource(DATA.SUCCESS_SOUND);
-            functions.playAudio(soundUrl);
+            //URL soundUrl = getClass().getResource(DATA.SUCCESS_SOUND);
+            //functions.playAudio(soundUrl);
             first_name_input.clear();
             last_name_input.clear();
             email_input.clear();

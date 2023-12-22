@@ -26,16 +26,16 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class MainWindow {
+public class MainWindowController {
     private final Functions functions = new Functions();
     @FXML
-    private Label ApplicationLabel;
+    private Label applicationLabel;
 
     @FXML
     private ResourceBundle resources;
 
     @FXML
-    private Label student_count;
+    private Label studentCount;
 
     @FXML
     private URL location;
@@ -46,52 +46,52 @@ public class MainWindow {
     @FXML
     private Label route;
     @FXML
-    private Label welcome_name;
+    private Label welcomeName;
 
     @FXML
-    private GridPane home_page;
+    private GridPane homePage;
 
     @FXML
-    private TableView<?> FrontTableView;
+    private TableView<?> frontTableView;
 
     @FXML
-    private GridPane student_management_page;
+    private GridPane managementPage;
 
     @FXML
-    private GridPane inquire_student_page;
+    private GridPane studentManagePage;
 
     @FXML
-    void AnalyticPage(ActionEvent event) {
-
+    private void analyticPageFunction(ActionEvent event) {
+        // need to add analytic function
     }
 
     @FXML
-    void Budget(ActionEvent event) {
-
+    private void budgetFunction(ActionEvent event) {
+        // need to add budgetFunction
     }
 
     @FXML
-    void ExamPage(ActionEvent event) {
-
+    private void examPageFunction(ActionEvent event) {
+        // need to add exam function
     }
     
     @FXML
-    void HomePage(ActionEvent event) {
+    private void homePageFunction(ActionEvent event) {
         autoFetch();
-        home_page.toFront();
+        homePage.toFront();
         route.setText("Dashboard/Home");
     }
 
     @FXML
-    void HomeworkPage(ActionEvent event) {
-
+    private void homeworkPageFunction(ActionEvent event) {
+        // add home work page function
     }
 
     @FXML
-    void LogoutPage(ActionEvent event) {
+    private void logoutPageFunction(ActionEvent event) {
         functions.LogoutUser();
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(DATA.LOGIN_FXML));
             Parent root = loader.load();
             Stage stage = new Stage();
             Scene scene = new Scene(root);
@@ -107,7 +107,7 @@ public class MainWindow {
     }
 
     @FXML
-    void SidebarToggle(ActionEvent event) {
+    private void sidebarToggle(ActionEvent event) {
         double newWidth = 80.0;
         double newBtnWidth=40.0;
         double oldWidth = 240.0;
@@ -134,24 +134,24 @@ public class MainWindow {
     }
 
     @FXML
-    void UserControl(ActionEvent event) {
-        inquire_student_page.toFront();
-        route.setText("Dashboard/User Control And Monitoring");
+    private void studentManagementPageFunction(ActionEvent event) {
+        studentManagePage.toFront();
+        route.setText("Dashboard/Student Management & Monitoring");
     }
 
     @FXML
-    void StudentManagement(ActionEvent event) {
-        student_management_page.toFront();
-        route.setText("Dashboard/Student Management");
+    private void managementPageFunction(ActionEvent event) {
+        managementPage.toFront();
+        route.setText("Dashboard/Management");
     }
 
     @FXML
-    void toggleTheme(ActionEvent event) {
-
+    private void toggleTheme(ActionEvent event) {
+      // toggle theme if possible
     }
 
     @FXML
-    void addCourse(ActionEvent event) {
+    private void addCourse(ActionEvent event) {
         Stage courseStage = new Stage();
         courseStage.setTitle("Add Course");
         try {
@@ -167,7 +167,7 @@ public class MainWindow {
     }
 
      @FXML
-    void UserRegistration(ActionEvent event) {
+    private void userRegistration(ActionEvent event) {
         Stage userStage = new Stage();
         userStage.setTitle("Add User");
         try {
@@ -183,7 +183,7 @@ public class MainWindow {
     }
 
     @FXML
-    void viewCourses(ActionEvent event){
+    private void viewCourses(ActionEvent event){
         Stage courseStage = new Stage();
         courseStage.setTitle("View Course");
         try {
@@ -199,7 +199,7 @@ public class MainWindow {
     }
 
     @FXML
-    void SyncFunction(ActionEvent event){
+    private void syncFunction(ActionEvent event){
         boolean result = SyncManagerCustom.startAutoSync();
         if (!result){
             Node source = (Node) event.getSource();
@@ -218,7 +218,7 @@ public class MainWindow {
             }
         };
         countStudentsTask.setOnSucceeded(e -> {
-            student_count.setText(countStudentsTask.getValue().toString());
+            studentCount.setText(countStudentsTask.getValue().toString());
         });
 
         new Thread(countStudentsTask).start();
@@ -236,20 +236,20 @@ public class MainWindow {
 
 
     @FXML
-    void initialize() {
+    private void initialize() {
         
         assert sidebar != null : "fx:id=\"sidebar\" was not injected: check your FXML file 'mainwindow.fxml'.";
-        assert welcome_name != null : "fx:id=\"welcome_name\" was not injected: check your FXML file 'mainwindow.fxml'.";
+        assert welcomeName != null : "fx:id=\"welcomeName\" was not injected: check your FXML file 'mainwindow.fxml'.";
         assert route != null : "fx:id=\"route\" was not injected: check your FXML file 'mainwindow.fxml'.";
-        assert home_page != null : "fx:id=\"home_page\" was not injected: check your FXML file 'mainwindow.fxml'.";
-        assert FrontTableView != null : "fx:id=\"FrontTableView\" was not injected: check your FXML file 'mainwindow.fxml'.";
-        assert student_management_page != null : "fx:id=\"student_management_page\" was not injected: check your FXML file 'mainwindow.fxml'.";
-        assert inquire_student_page != null : "fx:id=\"inquire_student_page\" was not injected: check your FXML file 'mainwindow.fxml'.";
+        assert homePage != null : "fx:id=\"homePage\" was not injected: check your FXML file 'mainwindow.fxml'.";
+        assert frontTableView != null : "fx:id=\"frontTableView\" was not injected: check your FXML file 'mainwindow.fxml'.";
+        assert managementPage != null : "fx:id=\"managementPage\" was not injected: check your FXML file 'mainwindow.fxml'.";
+        assert studentManagePage != null : "fx:id=\"studentManagePage\" was not injected: check your FXML file 'mainwindow.fxml'.";
 
-        ApplicationLabel.setText(DATA.APPLICATION_NAME);
+        applicationLabel.setText(DATA.APPLICATION_NAME);
         UserSession userSession = UserSession.getInstance();
         String name = userSession.getName();
-        welcome_name.setText("Welcome back "+name+"!");
+        welcomeName.setText("Welcome back "+name+"!");
         autoFetch();
     }
 }
