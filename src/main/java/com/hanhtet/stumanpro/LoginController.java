@@ -44,7 +44,7 @@ public class LoginController {
     private void loginFunction(ActionEvent event) {
         // Login user = new Login(emailInput.getText(), passwordInput.getText());
         Login user = new Login("admin@gmail.com", "admin2023");
-        boolean result = functions.LoginUser(user);
+        boolean result = functions.loginUser(user);
         if (result){
             FXMLLoader loader = new FXMLLoader(getClass().getResource(DATA.MAINWINDOW_FXML));
             if (loader != null) {

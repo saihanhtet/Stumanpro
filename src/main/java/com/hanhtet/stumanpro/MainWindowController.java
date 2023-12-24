@@ -199,6 +199,22 @@ public class MainWindowController {
     }
 
     @FXML
+    private void viewUser(ActionEvent event){
+        Stage userStage = new Stage();
+        userStage.setTitle("View Users");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_view.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            userStage.setScene(scene);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        userStage.show();
+    }
+
+    @FXML
     private void syncFunction(ActionEvent event){
         boolean result = SyncManagerCustom.startAutoSync();
         if (!result){
@@ -210,11 +226,12 @@ public class MainWindowController {
         }
     }
 
+
     private void autoFetch(){
         Task<Integer> countStudentsTask = new Task<>() {
             @Override
             protected Integer call() throws Exception {
-                return functions.count_user("student");
+                return functions.countUser("student");
             }
         };
         countStudentsTask.setOnSucceeded(e -> {

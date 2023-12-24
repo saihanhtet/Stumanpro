@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User {
+    private String Id;
     private String firstname;
     private String lastname;
     private String email;
@@ -21,6 +22,12 @@ public class User {
         this.picture = picture;
         this.address = address;
         this.role = role;
+    }
+    public void setId(String id){
+        this.Id = id;
+    }
+    public String getId(){
+        return this.Id;
     }
 
     public String getFirstname() {
@@ -53,6 +60,9 @@ public class User {
 
     public void setPassword(String password) {
         this.password = hashPassword(password);
+    }
+    public void setPasswordWithoutHash(String password){
+        this.password = password;
     }
 
     private String hashPassword(String plainTextPassword) {
@@ -110,5 +120,10 @@ public class User {
         userData.add(address);
         userData.add(role);
         return userData;
+    }
+
+    public void setName(String newValue) {
+        this.firstname = newValue;
+        this.lastname = "";
     }
 }

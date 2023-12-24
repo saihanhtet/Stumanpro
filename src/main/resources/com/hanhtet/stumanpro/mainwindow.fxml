@@ -19,9 +19,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="700.0" prefWidth="1200.0" styleClass="dashboard" stylesheets="@themes/style.css"
-    xmlns="http://javafx.com/javafx/8.0.171"
-    xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hanhtet.stumanpro.MainWindowController">
+<AnchorPane prefHeight="700.0" prefWidth="1200.0" styleClass="dashboard" stylesheets="@themes/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hanhtet.stumanpro.MainWindowController">
     <BorderPane layoutX="-31.0" layoutY="25.0" prefHeight="394.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <left>
             <VBox fx:id="sidebar" alignment="TOP_CENTER" minWidth="80.0" prefHeight="200.0" prefWidth="240.0" spacing="20.0" styleClass="sidebar" BorderPane.alignment="CENTER_LEFT">
@@ -31,7 +29,7 @@
                 <padding>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </padding>
-                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#homePageFunction" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="HOME" textOverrun="CLIP">
+                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#homePageFunction" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Home" textOverrun="CLIP">
                     <cursor>
                         <Cursor fx:constant="HAND" />
                     </cursor>
@@ -39,7 +37,7 @@
                         <FontAwesomeIcon glyphName="HOME" size="1.4em" styleClass="svg" />
                     </graphic>
                 </Button>
-                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#studentManagementPageFunction" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Student ManagementPageFunction" textOverrun="CLIP">
+                <Button alignment="TOP_LEFT" ellipsisString="" graphicTextGap="20.0" minWidth="40.0" mnemonicParsing="false" onAction="#studentManagementPageFunction" prefHeight="25.0" prefWidth="220.0" styleClass="sidebar-btn" text="Student View" textOverrun="CLIP">
                     <cursor>
                         <Cursor fx:constant="HAND" />
                     </cursor>
@@ -230,24 +228,20 @@
                         <RowConstraints maxHeight="120.0" minHeight="120.0" prefHeight="120.0" vgrow="NEVER" />
                         <RowConstraints maxHeight="505.0" minHeight="10.0" prefHeight="476.0" vgrow="ALWAYS" />
                     </rowConstraints>
-                    <VBox alignment="TOP_CENTER" prefHeight="521.0" prefWidth="470.0"
-                          styleClass="student_manage_options">
-                        <Label alignment="CENTER" prefHeight="17.0" prefWidth="500.0" styleClass="Label"
-                               text="User Management" VBox.vgrow="ALWAYS"/>
+                    <VBox alignment="TOP_CENTER" prefHeight="521.0" prefWidth="470.0" styleClass="student_manage_options">
+                        <Label alignment="CENTER" prefHeight="17.0" prefWidth="500.0" styleClass="Label" text="User Management" VBox.vgrow="ALWAYS" />
                         <HBox prefHeight="27.0" prefWidth="920.0" spacing="10.0" VBox.vgrow="NEVER">
-                            <Button mnemonicParsing="false" onAction="#userRegistration" prefHeight="25.0"
-                                    prefWidth="500.0" text="Registration"/>
-                            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="500.0" text="View Users"/>
-                            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="500.0"
-                                    text="Delete Users"/>
+                            <Button mnemonicParsing="false" onAction="#userRegistration" prefHeight="25.0" prefWidth="500.0" styleClass="PushButton" text="Registration" />
+                            <Button mnemonicParsing="false" onAction="#viewUser" prefHeight="25.0" prefWidth="500.0" styleClass="PushButton" text="View Users" />
+                            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="500.0" styleClass="PushButton" text="Delete Users" />
                         </HBox>
                     </VBox>
                     <VBox alignment="TOP_CENTER" prefHeight="521.0" prefWidth="470.0" styleClass="student_manage_options" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
                         <Label alignment="CENTER" prefHeight="17.0" prefWidth="500.0" styleClass="Label" text="Course Management" VBox.vgrow="ALWAYS" />
                         <HBox prefHeight="27.0" prefWidth="920.0" spacing="10.0" VBox.vgrow="NEVER">
-                            <Button mnemonicParsing="false" onAction="#addCourse" prefHeight="25.0" prefWidth="500.0" text="ADD Course" />
-                            <Button mnemonicParsing="false" onAction="#viewCourses" prefHeight="25.0" prefWidth="500.0" text="View Course" />
-                            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="500.0" text="Delete Course" />
+                            <Button mnemonicParsing="false" onAction="#addCourse" prefHeight="25.0" prefWidth="500.0" styleClass="PushButton" text="ADD Course" />
+                            <Button mnemonicParsing="false" onAction="#viewCourses" prefHeight="25.0" prefWidth="500.0" styleClass="PushButton" text="View Course" />
+                            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="500.0" styleClass="PushButton" text="Delete Course" />
                         </HBox>
                     </VBox>
                 </GridPane>

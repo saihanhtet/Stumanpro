@@ -203,3 +203,15 @@
 .table-view .virtual-flow .scroll-bar:horizontal .thumb {
   -fx-background-color: -fx-primary;
 }
+
+.PushButton{
+-fx-background-color: #ebedf3;
+-fx-background-radius: 5;
+-fx-border-width:1;
+-fx-border-radius: 5;
+-fx-border-color: #ebedf3;
+}
+.PushButton:hover{
+-fx-border-color: -fx-primary;
+-fx-text-fill: -fx-primary !important;
+}
