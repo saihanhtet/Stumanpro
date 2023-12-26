@@ -22,18 +22,18 @@
             <Label prefHeight="17.0" prefWidth="614.0" text="Enter First Name and Last Name:" />
             <HBox prefHeight="0.0" prefWidth="380.0" spacing="10.0">
                <children>
-                  <TextField fx:id="first_name_input" promptText="John" style="-fx-padding: 10; -fx-font-size: 15;" HBox.hgrow="ALWAYS" />
-                  <TextField fx:id="last_name_input" promptText="Wick" style="-fx-padding: 10; -fx-font-size: 15;" HBox.hgrow="ALWAYS" />
+                  <TextField fx:id="firstNameInput" promptText="John" style="-fx-padding: 10; -fx-font-size: 15;" HBox.hgrow="ALWAYS" />
+                  <TextField fx:id="lastNameInput" promptText="Wick" style="-fx-padding: 10; -fx-font-size: 15;" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
             <Label layoutX="20.0" layoutY="57.0" prefHeight="17.0" prefWidth="596.0" text="Enter Email:" />
-            <TextField fx:id="email_input" layoutX="20.0" layoutY="84.0" promptText="john@example.com" style="-fx-padding: 10; -fx-font-size: 15;" />
+            <TextField fx:id="emailInput" layoutX="20.0" layoutY="84.0" promptText="john@example.com" style="-fx-padding: 10; -fx-font-size: 15;" />
             <Label prefHeight="17.0" prefWidth="595.0" text="Enter Phone number:" />
-            <TextField fx:id="phno_input" promptText="+xx-xxx-xxx-xx" style="-fx-padding: 10; -fx-font-size: 15;" />
+            <TextField fx:id="phonoInput" promptText="+xx-xxx-xxx-xx" style="-fx-padding: 10; -fx-font-size: 15;" />
             <Label prefHeight="17.0" prefWidth="525.0" text="Enter User Type:" />
-            <ComboBox fx:id="user_type_input" prefHeight="40.0" prefWidth="746.0" promptText="Select the User Type" style="-fx-padding: 5; -fx-font-size: 14;" />
+            <ComboBox fx:id="userTypeInput" prefHeight="40.0" prefWidth="746.0" promptText="Select the User Type" style="-fx-padding: 5; -fx-font-size: 14;" />
             <Label prefHeight="17.0" prefWidth="590.0" text="Enter Address:" wrapText="true" />
-            <TextArea fx:id="address_input" prefHeight="150.0" prefWidth="480.0" />
+            <TextArea fx:id="addressInput" prefHeight="150.0" prefWidth="480.0" />
             <Button mnemonicParsing="false" onAction="#ADDUser" prefHeight="50.0" prefWidth="480.0" style="-fx-padding: 10;" text="Register" />
          </children>
       </VBox>

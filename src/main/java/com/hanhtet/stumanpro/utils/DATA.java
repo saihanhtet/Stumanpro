@@ -3,6 +3,9 @@ package com.hanhtet.stumanpro.utils;
 import java.io.File;
 
 public class DATA {
+    private DATA(){
+        throw new IllegalStateException("DATA class");
+    }
     
     public static final String USER_TABLE_RANGE = "lcfa_users!A2:I";
     public static final String COURSE_TABLE_RANGE = "lcfa_courses!A2:C";

@@ -4,6 +4,11 @@ import java.io.File;
 import java.io.IOException;
 
 public class SetupUtils {
+    
+    private SetupUtils(){
+        throw new IllegalStateException("Setup Utils class");
+    }
+    
     private static final String GOOGLE_SHEETS_DIRECTORY;
     private static final String LOCAL_FILES_DIRECTORY;
     private static final String SETUP_FLAG_FILE;

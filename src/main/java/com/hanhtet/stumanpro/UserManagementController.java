@@ -1,18 +1,17 @@
 package com.hanhtet.stumanpro;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import com.hanhtet.stumanpro.alert.CustomAlertBox;
-import com.hanhtet.stumanpro.entity.Course;
 import com.hanhtet.stumanpro.entity.User;
 import com.hanhtet.stumanpro.utils.DATA;
 import com.hanhtet.stumanpro.utils.Functions;
+import com.hanhtet.stumanpro.utils.OffSheetWriter;
 
-import com.hanhtet.stumanpro.utils.InternetConnectionChecker;
-import com.hanhtet.stumanpro.utils.SheetUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -31,17 +30,17 @@ public class UserManagementController {
     @FXML
     private URL location;
     @FXML
-    private TextField first_name_input;
+    private TextField firstNameInput;
     @FXML
-    private TextField last_name_input;
+    private TextField lastNameInput;
     @FXML
-    private TextField email_input;
+    private TextField emailInput;
     @FXML
-    private TextField phno_input;
+    private TextField phonoInput;
     @FXML
-    private ComboBox<String> user_type_input;
+    private ComboBox<String> userTypeInput;
     @FXML
-    private TextArea address_input;
+    private TextArea addressInput;
     @FXML
     private TableColumn<User, String> firstName;
     @FXML
@@ -67,23 +66,20 @@ public class UserManagementController {
 
     @FXML
     private void deleteUser(ActionEvent event){
-        System.out.println("Deleting the user");
+        // add function to delete user
     }
 
     @FXML
     void ADDUser(ActionEvent event) {
-        System.out.println("Adding the User");
         User user = getUser();
         boolean result = functions.registerUser(user, true);
         if (result){
-            //URL soundUrl = getClass().getResource(DATA.SUCCESS_SOUND);
-            //functions.playAudio(soundUrl);
-            first_name_input.clear();
-            last_name_input.clear();
-            email_input.clear();
-            phno_input.clear();
-            address_input.clear();
-            user_type_input.getSelectionModel().clearSelection();
+            firstNameInput.clear();
+            lastNameInput.clear();
+            emailInput.clear();
+            phonoInput.clear();
+            addressInput.clear();
+            userTypeInput.getSelectionModel().clearSelection();
         }else{
             Node source = (Node) event.getSource();
             Stage primaryStage = (Stage) source.getScene().getWindow();
@@ -146,9 +142,9 @@ public class UserManagementController {
         newData.add(user.getPicture());
         newData.add(user.getAddress());
         newData.add(user.getRole());
-        String updatedId = user.getId().toString();
+        String updatedId = user.getId();
         try {
-            SheetUtils.editDataInLocalFile(updatedId, newData, DATA.DOWNLOAD_XLXS_FOLDER_PATH +"\\"+"lcfa_users.xlsx");
+            OffSheetWriter.editDataById(updatedId, newData, DATA.DOWNLOAD_XLXS_FOLDER_PATH +File.separator+"lcfa_users.xlsx");
         } catch (Exception e) {
             System.err.println("Something went wrong with editing the course!"+e);
         }
@@ -156,25 +152,24 @@ public class UserManagementController {
 
     @NotNull
     private User getUser() {
-        String firstName = first_name_input.getText();
-        String lastName = last_name_input.getText().toString();
-        String email = email_input.getText().toString();
+        String firstname = firstNameInput.getText();
+        String lastname = lastNameInput.getText();
+        String email = emailInput.getText();
         String passString = "P@ssw0rd2006";
-        String phString = phno_input.getText().toString();
-        String address = (String) address_input.getText().toString();
-        String user_type = user_type_input.getValue().toString().toLowerCase();
-        User user = new User(firstName, lastName, email, passString, phString,"null",address,user_type);
-        return user;
+        String phString = phonoInput.getText();
+        String address = (String) addressInput.getText();
+        String userType = userTypeInput.getValue().toLowerCase();
+        return new User(firstname, lastname, email, passString, phString,"null",address,userType);
     }
 
     @FXML
     void initialize() {
-        assert first_name_input != null : "fx:id=\"first_name_input\" was not injected: check your FXML file 'user_add.fxml'.";
-        assert last_name_input != null : "fx:id=\"last_name_input\" was not injected: check your FXML file 'user_add.fxml'.";
-        assert email_input != null : "fx:id=\"email_input\" was not injected: check your FXML file 'user_add.fxml'.";
-        assert phno_input != null : "fx:id=\"phno_input\" was not injected: check your FXML file 'user_add.fxml'.";
-        assert user_type_input != null : "fx:id=\"user_type_input\" was not injected: check your FXML file 'user_add.fxml'.";
-        assert address_input != null : "fx:id=\"address_input\" was not injected: check your FXML file 'user_add.fxml'.";
+        assert firstNameInput != null : "fx:id=\"firstNameInput\" was not injected: check your FXML file 'user_add.fxml'.";
+        assert lastNameInput != null : "fx:id=\"lastNameInput\" was not injected: check your FXML file 'user_add.fxml'.";
+        assert emailInput != null : "fx:id=\"emailInput\" was not injected: check your FXML file 'user_add.fxml'.";
+        assert phonoInput != null : "fx:id=\"phonoInput\" was not injected: check your FXML file 'user_add.fxml'.";
+        assert userTypeInput != null : "fx:id=\"userTypeInput\" was not injected: check your FXML file 'user_add.fxml'.";
+        assert addressInput != null : "fx:id=\"addressInput\" was not injected: check your FXML file 'user_add.fxml'.";
         
         try{
             ObservableList<String> userTypes = FXCollections.observableArrayList(
@@ -182,7 +177,7 @@ public class UserManagementController {
                     "Teacher",
                     "Student"
             );
-            user_type_input.setItems(userTypes);
+            userTypeInput.setItems(userTypes);
         } catch (Exception e){
             System.err.println(e);
         }

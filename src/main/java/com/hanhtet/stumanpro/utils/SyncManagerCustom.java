@@ -4,6 +4,10 @@ import java.util.Map;
 
 public class SyncManagerCustom {
 
+    private SyncManagerCustom(){
+        throw new IllegalStateException("Sync Manager Custom class");
+    }
+
     public static boolean AutoSyncData(){
         boolean isInternet = InternetConnectionChecker.isInternetAvailable();
         if (isInternet){

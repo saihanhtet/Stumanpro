@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SessionManager {
+
+    private SessionManager(){
+        throw new IllegalStateException("Session Manager class");
+    }
     private static final Map<String, UserSession> activeSessions = new HashMap<>();
     public static void createSession(UserSession userSession) {
         activeSessions.put(userSession.getId(), userSession);
