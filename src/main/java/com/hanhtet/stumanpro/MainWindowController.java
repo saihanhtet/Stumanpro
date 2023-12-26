@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import org.controlsfx.control.action.Action;
+
 import com.hanhtet.stumanpro.alert.CustomAlertBox;
 import com.hanhtet.stumanpro.utils.DATA;
 import com.hanhtet.stumanpro.utils.Functions;
@@ -231,6 +233,23 @@ public class MainWindowController {
             return;
         }
         userStage.show();
+    }
+
+    @FXML
+    private void deleteCourses(ActionEvent event){
+        Stage courseStage = new Stage();
+        courseStage.setTitle("Delete Course");
+        courseStage.alwaysOnTopProperty();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("course_delete.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            courseStage.setScene(scene);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        courseStage.show();
     }
 
     @FXML

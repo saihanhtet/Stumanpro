@@ -233,7 +233,7 @@
                         <HBox prefHeight="27.0" prefWidth="920.0" spacing="10.0" VBox.vgrow="NEVER">
                             <Button mnemonicParsing="false" onAction="#userRegistration" prefHeight="25.0" prefWidth="500.0" styleClass="PushButton" text="Registration" />
                             <Button mnemonicParsing="false" onAction="#viewUser" prefHeight="25.0" prefWidth="500.0" styleClass="PushButton" text="View Users" />
-                            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="500.0" styleClass="PushButton" text="Delete Users" />
+                            <Button mnemonicParsing="false" onAction="#deleteUser" prefHeight="25.0" prefWidth="500.0" styleClass="PushButton" text="Delete Users" />
                         </HBox>
                     </VBox>
                     <VBox alignment="TOP_CENTER" prefHeight="521.0" prefWidth="470.0" styleClass="student_manage_options" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
@@ -241,7 +241,7 @@
                         <HBox prefHeight="27.0" prefWidth="920.0" spacing="10.0" VBox.vgrow="NEVER">
                             <Button mnemonicParsing="false" onAction="#addCourse" prefHeight="25.0" prefWidth="500.0" styleClass="PushButton" text="ADD Course" />
                             <Button mnemonicParsing="false" onAction="#viewCourses" prefHeight="25.0" prefWidth="500.0" styleClass="PushButton" text="View Course" />
-                            <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="500.0" styleClass="PushButton" text="Delete Course" />
+                            <Button mnemonicParsing="false" onAction="#deleteCourses" prefHeight="25.0" prefWidth="500.0" styleClass="PushButton" text="Delete Course" />
                         </HBox>
                     </VBox>
                 </GridPane>
