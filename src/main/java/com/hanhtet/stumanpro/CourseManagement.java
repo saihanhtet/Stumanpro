@@ -30,20 +30,16 @@ public class CourseManagement {
     private TableColumn<Course, String> coursePerPrice; 
     @FXML
     private ResourceBundle resources;
-
     @FXML
     private URL location;
     @FXML
     private TableColumn<Course, String> courseID;
-
     @FXML
     private TextField courseInput;
     @FXML
     private TextField coursePrice;
-
     @FXML
     private TableView<Course> courseTable;
-
 
     @FXML
     private void addCourse(ActionEvent event) {
@@ -72,7 +68,7 @@ public class CourseManagement {
     private void setCellFactoryForColumns() {
         courseName.setCellFactory(TextFieldTableCell.forTableColumn());
         coursePerPrice.setCellFactory(TextFieldTableCell.forTableColumn());
-
+        // add function when edit
         courseName.setOnEditCommit(event -> {
             Course course = event.getRowValue();
             course.setName(event.getNewValue());
@@ -85,7 +81,7 @@ public class CourseManagement {
             courseTable.getItems().set(event.getTablePosition().getRow(), course);
             edit(course);
         });
-
+        // set the column to editable
         courseName.setEditable(true);
         coursePerPrice.setEditable(true);
     }
@@ -95,7 +91,7 @@ public class CourseManagement {
         newData.add(Integer.parseInt(course.getId()));
         newData.add(course.getName());
         newData.add(Integer.parseInt(course.getPrice()));
-        String updatedId = course.getId().toString();
+        String updatedId = course.getId();
         try {
             SheetUtils.editDataInLocalFile(updatedId, newData, DATA.DOWNLOAD_XLXS_FOLDER_PATH +"\\"+"lcfa_courses.xlsx");
             //SheetUtils.updateDataInSheet(updatedId, newData, DATA.courseTable_ID, DATA.courseTable_RANGE);

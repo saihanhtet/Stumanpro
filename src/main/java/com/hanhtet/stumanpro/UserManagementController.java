@@ -62,12 +62,19 @@ public class UserManagementController {
     private TableColumn<User, String> userRole;
     @FXML
     private TableView<User> userTable;
+    @FXML
+    private ComboBox<User> userSelectionComboBox;
+
+    @FXML
+    private void deleteUser(ActionEvent event){
+        System.out.println("Deleting the user");
+    }
 
     @FXML
     void ADDUser(ActionEvent event) {
         System.out.println("Adding the User");
         User user = getUser();
-        boolean result = functions.RegisterUser(user, true);
+        boolean result = functions.registerUser(user, true);
         if (result){
             //URL soundUrl = getClass().getResource(DATA.SUCCESS_SOUND);
             //functions.playAudio(soundUrl);

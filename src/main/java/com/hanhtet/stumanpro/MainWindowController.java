@@ -122,8 +122,7 @@ public class MainWindowController {
         }
         // change size of all children from sidebar
         for (Node node : vBoxChildren) {
-            if (node instanceof Button) {
-                Button button = (Button) node;
+            if (node instanceof Button button) {
                 if (sidebar.getPrefWidth() == newWidth) {
                     button.setPrefWidth(newBtnWidth);
                 } else {
@@ -170,6 +169,7 @@ public class MainWindowController {
     private void userRegistration(ActionEvent event) {
         Stage userStage = new Stage();
         userStage.setTitle("Add User");
+        userStage.alwaysOnTopProperty();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("user_add.fxml"));
             Parent root = loader.load();
@@ -186,6 +186,7 @@ public class MainWindowController {
     private void viewCourses(ActionEvent event){
         Stage courseStage = new Stage();
         courseStage.setTitle("View Course");
+        courseStage.alwaysOnTopProperty();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("course_view.fxml"));
             Parent root = loader.load();
@@ -202,8 +203,26 @@ public class MainWindowController {
     private void viewUser(ActionEvent event){
         Stage userStage = new Stage();
         userStage.setTitle("View Users");
+        userStage.alwaysOnTopProperty();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("user_view.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            userStage.setScene(scene);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        userStage.show();
+    }
+
+    @FXML
+    private void deleteUser(ActionEvent event){
+        Stage userStage = new Stage();
+        userStage.setTitle("Delete User");
+        userStage.alwaysOnTopProperty();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("user_delete.fxml"));
             Parent root = loader.load();
             Scene scene = new Scene(root);
             userStage.setScene(scene);
@@ -249,7 +268,6 @@ public class MainWindowController {
         
         new Thread(syncTask).start();
     }
-
 
 
     @FXML

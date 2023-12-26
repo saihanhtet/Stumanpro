@@ -21,23 +21,16 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class LoginController {
-
     @FXML
     private Label applicationLabel;
-
     @FXML
     private ResourceBundle resources;
-
     @FXML
     private URL location;
-
     @FXML
     private TextField emailInput;
-
     @FXML
     private PasswordField passwordInput;
-
-
     private Functions functions;
 
     @FXML
@@ -47,22 +40,18 @@ public class LoginController {
         boolean result = functions.loginUser(user);
         if (result){
             FXMLLoader loader = new FXMLLoader(getClass().getResource(DATA.MAINWINDOW_FXML));
-            if (loader != null) {
-                try {
-                    Parent root = loader.load();
-                    Stage stage = new Stage();
-                    Scene scene = new Scene(root);
-                    stage.setScene(scene);
-                    stage.setTitle(DATA.APPLICATION_NAME);
-                    stage.show();
-                    ((Node) event.getSource()).getScene().getWindow().hide();
-                } catch (IOException e) {
-                    Node source = (Node) event.getSource();
-                    Stage primaryStage = (Stage) source.getScene().getWindow();
-                    CustomAlertBox.showAlert(Alert.AlertType.INFORMATION, primaryStage, "File Not existed", "The MainWindow Not Existed!", "MainWindow does not existed maybe it lost in compiling?");
-                }
-            } else {
-                System.out.println("FXML file not found!");
+            try {
+                Parent root = loader.load();
+                Stage stage = new Stage();
+                Scene scene = new Scene(root);
+                stage.setScene(scene);
+                stage.setTitle(DATA.APPLICATION_NAME);
+                stage.show();
+                ((Node) event.getSource()).getScene().getWindow().hide();
+            } catch (IOException e) {
+                Node source = (Node) event.getSource();
+                Stage primaryStage = (Stage) source.getScene().getWindow();
+                CustomAlertBox.showAlert(Alert.AlertType.INFORMATION, primaryStage, "File Not existed", "The MainWindow Not Existed!", "MainWindow does not existed maybe it lost in compiling?");
             }
         } else {
             Node source = (Node) event.getSource();
