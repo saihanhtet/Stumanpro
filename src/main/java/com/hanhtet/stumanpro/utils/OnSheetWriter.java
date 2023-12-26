@@ -27,36 +27,44 @@ import java.io.*;
 import java.nio.file.FileSystems;
 import java.security.GeneralSecurityException;
 import java.util.*;
+import java.util.logging.*;
 
 public class OnSheetWriter {
+    private OnSheetWriter(){
+        throw new IllegalStateException("OnSheetWriter class");
+    }
+
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static final String downloadFolder = getDownloadFolderPath();
+    private static final String DOWNLOADFOLDER = getDownloadFolderPath();
     private static final List<String> SCOPES = Arrays.asList(DriveScopes.DRIVE, SheetsScopes.SPREADSHEETS);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
     private static final Sheets sheetService = getSheetsService();
     private static final Drive driveService = getDriveService();
+    
+    private static final Logger logger = Logger.getLogger(DATA.APPLICATION_NAME);
+    
     public static Sheets getSheetService(){
         return sheetService;
     }
     public static void writeSpreadsheetInfoToFile(Map<String, String> spreadsheetInfo) {
-        String filePath = DATA.GOOGLE_SHEETS_DIRECTORY + "\\" + "sheetId.txt";
+        String filePath = DATA.GOOGLE_SHEETS_DIRECTORY + File.separator + "sheetId.txt";
         File file = new File(filePath);
         if (!file.exists()) {
             file.getParentFile().mkdirs();
             try (FileOutputStream fileOut = new FileOutputStream(filePath);
                  ObjectOutputStream objectOut = new ObjectOutputStream(fileOut)) {
                 objectOut.writeObject(spreadsheetInfo);
-                System.out.println("Spreadsheet info successfully written to file.");
+                logger.info("Spreadsheet info successfully written to file.");
             } catch (IOException e) {
                 e.printStackTrace();
-                System.err.println("Error occurred at writing the spreadsheet Id!");
+                logger.warning("Error occurred at writing the spreadsheet Id!");
             }
         }else{
-            System.out.println("Google sheet Id are already added!");
+            logger.info("Google sheet ID are already been added!");
         }
     }
     public static Map<String, String> readSpreadsheetInfoFromFile() {
-        String filePath = DATA.GOOGLE_SHEETS_DIRECTORY + "\\" + "sheetId.txt";
+        String filePath = DATA.GOOGLE_SHEETS_DIRECTORY + File.separator + "sheetId.txt";
         Map<String, String> spreadsheetInfo = new HashMap<>();
         try (FileInputStream fileIn = new FileInputStream(filePath);
              ObjectInputStream objectIn = new ObjectInputStream(fileIn)) {
@@ -65,17 +73,16 @@ public class OnSheetWriter {
                 spreadsheetInfo = (Map<String, String>) obj;
             }
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            System.err.println("Error occurred at reading the spreadsheet Id!");
+            logger.warning("Error occurred at reading the spreadsheet Id!");
         }
         return spreadsheetInfo;
     }
     private static Sheets getSheetsService() {
 
         try {
-            NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            Credential gCredential = getCredentials(HTTP_TRANSPORT,SCOPES);
-            return new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, gCredential)
+            NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+            Credential gCredential = getCredentials(httpTransport,SCOPES);
+            return new Sheets.Builder(httpTransport, JSON_FACTORY, gCredential)
                     .setApplicationName(DATA.APPLICATION_NAME)
                     .build();
         } catch (GeneralSecurityException | IOException e) {
@@ -85,9 +92,9 @@ public class OnSheetWriter {
     }
     private static Drive getDriveService() {
         try {
-            NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            Credential gCredential = getCredentials(HTTP_TRANSPORT,SCOPES);
-            return new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY,gCredential)
+            NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+            Credential gCredential = getCredentials(httpTransport,SCOPES);
+            return new Drive.Builder(httpTransport, JSON_FACTORY,gCredential)
                     .setApplicationName(DATA.APPLICATION_NAME)
                     .build();
         } catch (GeneralSecurityException | IOException e) {
@@ -95,13 +102,13 @@ public class OnSheetWriter {
         }
         return null;
     }
-    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT, List<String> scopes)
+    private static Credential getCredentials(final NetHttpTransport httpTransport, List<String> scopes)
             throws IOException {
         InputStream in = SheetUtils.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         assert in != null;
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes)
+                httpTransport, JSON_FACTORY, clientSecrets, scopes)
                 .setDataStoreFactory(new FileDataStoreFactory(new File(DATA.TOKENS_DIRECTORY_PATH)))
                 .setAccessType("offline")
                 .build();
@@ -114,7 +121,7 @@ public class OnSheetWriter {
                 .append(spreadsheetId, range, body)
                 .setValueInputOption("RAW")
                 .execute();
-        System.out.println("Header is successfully added!");
+        logger.info("Header is successfully added!");
     }
     public static Map<Integer, String> adjustRange(String range) {
         Map<Integer, String> result = new HashMap<>();
@@ -135,7 +142,7 @@ public class OnSheetWriter {
     private static String getDownloadFolderPath() {
         return FileSystems.getDefault().getPath(System.getProperty("user.home"), "Downloads").toString();
     }
-    public static void appendDataToSheet(@NotNull List<List<Object>> newData, String spreadsheetId, String range) throws IOException, GeneralSecurityException {
+    public static void appendDataToSheet(@NotNull List<List<Object>> newData, String spreadsheetId, String range) throws IOException {
         List<List<Object>> existingData = readFromSheet(spreadsheetId, range);
         int lastRowIndex = (existingData != null && !existingData.isEmpty()) ? existingData.size() : 0;
         int newId = (lastRowIndex > 0) ? Integer.parseInt(existingData.get(lastRowIndex - 1).get(0).toString()) + 1 : 1;
@@ -153,13 +160,13 @@ public class OnSheetWriter {
                     .append(spreadsheetId, rangeForAppend, body)
                     .setValueInputOption("RAW")
                     .execute();
-            System.out.println("Data successfully appended to the sheet with ID: " + newId);
+            logger.log(Level.INFO, "Data successfully appended to the sheet with ID: {0}", newId);
         } catch (IOException e) {
-            System.err.println("An error occurred while appending data to the sheet.");
+            logger.log(Level.WARNING, "An error occurred while appending data to the sheet.");
         }
     }
 
-    public static void deleteRowById(String idToDelete, String spreadsheetId, String range) throws IOException, GeneralSecurityException {
+    public static void deleteRowById(String idToDelete, String spreadsheetId, String range) throws IOException {
         List<List<Object>> data = readFromSheet(spreadsheetId, range);
 
         if (data != null && !data.isEmpty()) {
@@ -180,19 +187,17 @@ public class OnSheetWriter {
                             .update(spreadsheetId, range, body)
                             .setValueInputOption("RAW")
                             .execute();
-                    System.out.println("Row with ID " + idToDelete + " successfully deleted from the sheet.");
+                    logger.log(Level.INFO, "Row with ID {0} has been successfully deleted from the sheet.", idToDelete);
                 } catch (IOException e) {
-                    System.err.println("An error occurred while deleting the row:");
+                    logger.log(Level.WARNING, "An error occurred while deleting the row!");
                 }
             } else {
-                System.out.println("ID " + idToDelete + " not found in the sheet.");
+                logger.log(Level.INFO,"ID {0} not found in the sheet.", idToDelete);
             }
-        } else {
-            System.out.println("No data found in the sheet.");
         }
     }
 
-    public static void updateDataInSheet(String idToUpdate, List<Object> newData, String spreadsheetId, String range) throws IOException, GeneralSecurityException {
+    public static void updateDataInSheet(String idToUpdate, List<Object> newData, String spreadsheetId, String range) throws IOException {
         List<List<Object>> data = readFromSheet(spreadsheetId, range);
         if (data != null && !data.isEmpty()) {
             int columnIndexToUpdate = 0; // Change this according to your data structure
@@ -213,63 +218,63 @@ public class OnSheetWriter {
                             .update(spreadsheetId, range, body)
                             .setValueInputOption("RAW")
                             .execute();
-                    System.out.println("Data with ID " + idToUpdate + " successfully updated in the sheet.");
+                    logger.log(Level.INFO, "Data with ID {0} successfully updated in the sheet.", idToUpdate);
                 } catch (IOException e) {
-                    System.err.println("An error occurred while updating data:");
+                    logger.warning("An error occurred while updating data:");
                 }
             } else {
-                System.out.println("ID " + idToUpdate + " not found in the sheet.");
+                logger.log(Level.INFO, "ID {0} not found in the sheet.", idToUpdate);
             }
         } else {
-            System.out.println("No data found in the sheet.");
+            logger.info("No data found in the sheet.");
         }
     }
 
     // read from online full and without header
-    public static List<List<Object>> readFromSheet(String spreadsheetId, String range) throws IOException, GeneralSecurityException {
+    public static List<List<Object>> readFromSheet(String spreadsheetId, String range) throws IOException {
         ValueRange response = sheetService.spreadsheets().values()
                 .get(spreadsheetId, range)
                 .execute();
         return response.getValues();
     }
 
-    public static Map<Integer, Object> readFromSheetFull(String spreadsheetId, String range) throws IOException, GeneralSecurityException {
-        Map<Integer, String> return_list = adjustRange(range);
+    public static Map<Integer, Object> readFromSheetFull(String spreadsheetId, String range) throws IOException {
+        Map<Integer, String> returnList = adjustRange(range);
         Map<Integer, Object> result = new HashMap<>();
         ValueRange response = sheetService.spreadsheets().values()
-                .get(spreadsheetId, return_list.get(1))
+                .get(spreadsheetId, returnList.get(1))
                 .execute();
-        result.put(0, return_list.get(0));
+        result.put(0, returnList.get(0));
         result.put(1, response.getValues());
         return result;
     }
     public static void downloadFile(String sheetName, String spreadsheetId, String range) {
         try {
-            Map<Integer, Object> response_data = SheetUtils.readFromSheetFull(spreadsheetId, range);
-            Object responseData = response_data.get(1);
+            Map<Integer, Object> responseDataOld = SheetUtils.readFromSheetFull(spreadsheetId, range);
+            Object responseData = responseDataOld.get(1);
             List<List<Object>> sheetData;
 
             if (responseData instanceof List<?> dataList) {
                 if (!dataList.isEmpty() && dataList.get(0) instanceof List) {
                     sheetData = (List<List<Object>>) responseData;
 
-                    String filePath = DATA.DOWNLOAD_XLXS_FOLDER_PATH + "\\" + sheetName + ".xlsx";
+                    String filePath = DATA.DOWNLOAD_XLXS_FOLDER_PATH + File.separator + sheetName + ".xlsx";
                     File file = new File(filePath);
                     if (!file.exists()) {
                         file.getParentFile().mkdirs(); // Create parent directories if they don't exist
                         OffSheetWriter.createSheet(sheetData, filePath, sheetName);
-                        System.out.println("Excel file created successfully!");
+                        logger.info("Excel file created successfully!");
                     } else {
-                        System.out.println("File already exists at: " + filePath);
+                        logger.log(Level.SEVERE,"File already exists at: {0}", filePath);
                     }
                 } else {
-                    System.out.println("No data found in the sheet.");
+                    logger.info("No data found in the sheet.");
                 }
             } else {
-                System.out.println("Retrieved data is not in the expected format");
+                logger.info("Retrieved data is not in the expected format");
             }
         } catch (IOException | GeneralSecurityException e) {
-            System.err.println("Error occurred while downloading data from the sheet.");
+            logger.warning("Error occurred while downloading data from the sheet.");
         }
     }
 
@@ -286,7 +291,7 @@ public class OnSheetWriter {
         }
 
         String spreadsheetId = spreadsheet.getSpreadsheetId();
-        System.out.println("Created new spreadsheet named: "+sheetName);
+        logger.log(Level.INFO,"Created new spreadsheet named: {0}", sheetName);
 
         try {
             BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest();
@@ -296,7 +301,7 @@ public class OnSheetWriter {
                             .setFields("title"))));
             sheetService.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest).execute();
         } catch (IOException e) {
-            System.err.println("Error updating sheet title: " + e.getMessage());
+            logger.warning("Error updating sheet title: " + e.getMessage());
         }
 
         // Set the permission to allow anyone with the link to edit
@@ -309,7 +314,7 @@ public class OnSheetWriter {
         try {
             driveService.permissions().create(spreadsheetId, newPermission).execute();
         } catch (IOException e) {
-            System.err.println("Can't add data in this create file instance!");
+            logger.warning("Can't add data in this create file instance!");
         }
         return spreadsheetId;
     }
@@ -320,17 +325,17 @@ public class OnSheetWriter {
             // Fetch data from Google Sheets
             Map<Integer, Object> resultData = fetchDataFromGoogleSheet(tableId, tableRange);
             List<List<Object>> newData = (List<List<Object>>) resultData.get(1);
-            String filePath = downloadFolder + "\\"+"new_testing.xlsx";
+            String filePath = DOWNLOADFOLDER + File.separator +"new_testing.xlsx";
 
             List<List<Object>> localData = OffSheetWriter.readData(filePath);
             if (!newData.equals(localData)) {
                 updateLocalFile(newData,filePath); // Update local file with new data
-                System.out.println("Local file updated successfully.");
+                logger.info("Local file updated successfully.");
             } else {
-                System.out.println("Local file is already up-to-date.");
+                logger.info("Local file is already up-to-date.");
             }
         } catch (IOException | GeneralSecurityException e) {
-            System.err.println("Error occurred while syncing: "+e);
+            logger.warning("Error occurred while syncing: "+e);
         }
     }
 
@@ -339,16 +344,16 @@ public class OnSheetWriter {
         try {
             Map<Integer, Object> resultData = fetchDataFromGoogleSheet(tableId, tableRange);
             List<List<Object>> newData = (List<List<Object>>) resultData.get(1);
-            String filePath = DATA.DOWNLOAD_XLXS_FOLDER_PATH + "\\"+sheetName+".xlsx";
+            String filePath = DATA.DOWNLOAD_XLXS_FOLDER_PATH + File.separator +sheetName+".xlsx";
             List<List<Object>> localData = OffSheetWriter.readData(filePath);
             if (!newData.equals(localData)) {
                 updateGoogleSheet(localData, tableId, tableRange);
-                System.out.println("Google Sheet file updated successfully.");
+                logger.info("Google Sheet file updated successfully.");
             } else {
-                System.out.println("Google Sheet file is already up-to-date.");
+                logger.info("Google Sheet file is already up-to-date.");
             }
         } catch (IOException | GeneralSecurityException e) {
-            System.err.println("Error occurred while syncing:"+e);
+            logger.warning("Error occurred while syncing:"+e);
         }
     }
 
@@ -360,7 +365,7 @@ public class OnSheetWriter {
                     .setValueInputOption("RAW")
                     .execute();
         } catch (IOException e) {
-            System.err.println("Error occurred while updating Google Sheet: "+e);
+            logger.warning("Error occurred while updating Google Sheet: "+e);
         }
     }
 
@@ -389,7 +394,7 @@ public class OnSheetWriter {
             workbook.close();
             outputStream.close();
         } catch (IOException e) {
-            System.err.println("File not found error while syncing: "+e);
+            logger.warning("File not found error while syncing: "+e);
         }
 
     }

@@ -20,7 +20,7 @@
             <TextField fx:id="courseInput" style="-fx-padding: 10; -fx-font-size: 15;" />
             <Label layoutX="20.0" layoutY="57.0" prefHeight="17.0" prefWidth="411.0" text="Enter Course Price:" />
             <TextField fx:id="coursePrice" layoutX="20.0" layoutY="84.0" style="-fx-padding: 10; -fx-font-size: 15;" />
-            <Button mnemonicParsing="false" onAction="#ADDCourse" prefHeight="25.0" prefWidth="428.0" style="-fx-padding: 10;" text="ADD" />
+            <Button mnemonicParsing="false" onAction="#addCourse" prefHeight="25.0" prefWidth="428.0" style="-fx-padding: 10;" text="ADD" />
          </children>
       </VBox>
    </children>

@@ -89,7 +89,7 @@ public class MainWindowController {
 
     @FXML
     private void logoutPageFunction(ActionEvent event) {
-        functions.LogoutUser();
+        functions.logoutUser();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(DATA.LOGIN_FXML));
             Parent root = loader.load();

@@ -4,8 +4,8 @@ import com.hanhtet.stumanpro.entity.Course;
 import com.hanhtet.stumanpro.entity.Login;
 import com.hanhtet.stumanpro.entity.User;
 
+import java.io.File;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +14,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Functions {
-    private static final Logger LOGGER = Logger.getLogger(DATA.APPLICATION_NAME);
-    private static Map<String, String> SPREADSHEET_ID_GROUP;
+    private static final Logger logger = Logger.getLogger(DATA.APPLICATION_NAME);
+    private static Map<String, String> SPREADSHEETGROUP;
+    
     public void addUserToSession(User user){
         UserSession userSession = UserSession.getInstance();
         userSession.loginUser(
@@ -32,9 +33,9 @@ public class Functions {
 
     public boolean loginOfflineUser(Login user, List<User> existingUsers) {
         for (User exUser : existingUsers) {
-            System.out.println(exUser.getEmail()+"|"+user.getEmail());
+            logger.info(exUser.getEmail()+"|"+user.getEmail());
             if (exUser.getEmail().equals(user.getEmail()) && exUser.getPassword().equals(user.getPassword())) {
-                System.out.println("Login successful for email offline: " + user.getEmail());
+                logger.info("Login successful for email offline: " + user.getEmail());
                 addUserToSession(exUser);
                 return true;
             }
@@ -47,7 +48,7 @@ public class Functions {
             if (row.size() >= 8) { // Check if the row has enough data for a user
                 User currentUser = getUserFromRow(row);
                 if (currentUser.getEmail().equals(user.getEmail()) && currentUser.getPassword().equals(user.getPassword())) {
-                    System.out.println("Login successful for email: " + currentUser.getEmail());
+                    logger.info("Login successful for email: " + currentUser.getEmail());
                     addUserToSession(currentUser);
                     return true;
                 }
@@ -58,21 +59,20 @@ public class Functions {
 
     public boolean registerUser(User user, Boolean defaultPass){
         try {
-            if (defaultPass) {
+            if (Boolean.TRUE.equals(defaultPass)) {
                 user.setPassword("LightClassForAll");
             }
             List<Object> userData = user.getAllDataAsList();
-            boolean result = addData(userData, SPREADSHEET_ID_GROUP.get("lcfa_users"), DATA.USER_TABLE_RANGE, "lcfa_users");
+            boolean result = addData(userData, SPREADSHEETGROUP.get("lcfa_users"), DATA.USER_TABLE_RANGE, "lcfa_users");
             if (result){
-                System.out.println("Added USER: " + user.getName());
+                logger.info("Added USER: " + user.getName());
             }
             else{
-                System.err.println("Error occurred at adding USER.");
+                logger.warning("Error occurred at adding USER.");
             }
             return result;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "An error occurred while appending data to the sheet", e);
-            System.err.println("An error occurred while appending data to the sheet.");
+            logger.log(Level.SEVERE, "An error occurred while appending data to the sheet", e);
         }
         return false;
     }
@@ -80,27 +80,26 @@ public class Functions {
     public boolean loginUser(Login user) {
         if (InternetConnectionChecker.isInternetAvailable()) {
             try {
-                List<List<Object>> existingData = OnSheetWriter.readFromSheet(SPREADSHEET_ID_GROUP.get("lcfa_users"), DATA.USER_TABLE_RANGE);
+                List<List<Object>> existingData = OnSheetWriter.readFromSheet(SPREADSHEETGROUP.get("lcfa_users"), DATA.USER_TABLE_RANGE);
                 if (existingData != null && !existingData.isEmpty()) {
                     return loginOnlineUser(user, existingData);
                 }
-                System.out.println("Login failed. Invalid email or password.");
                 return false;
-            } catch (IOException | GeneralSecurityException e) {
-                throw new RuntimeException(e);
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "An error occurred durring online login: ", e);
             }
         } else {
-            System.err.println("Internet connection is not available!");
+            logger.warning("Internet connection is not available!");
             try {
                 List<User> existingUsers = getUsersFromSheet();
                 if (existingUsers != null && !existingUsers.isEmpty()) {
                     return loginOfflineUser(user, existingUsers);
                 }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                logger.log(Level.SEVERE, "An error occurred durring offline login: ", e);
             }
-            return false;
         }
+        return false;
     }
 
     private User getUserFromRow(List<Object> row) {
@@ -119,83 +118,82 @@ public class Functions {
         return user;
     }
 
-    public void LogoutUser(){
+    public void logoutUser(){
         UserSession userSession = UserSession.getInstance();
         userSession.logoutUser();
     }
 
-    public Integer countUser(String userType){
+    public Integer countUser(String userType) {
         int count = 0;
-        if (InternetConnectionChecker.isInternetAvailable()){
-            try{
-                List<List<Object>> existingData = OnSheetWriter.readFromSheet(SPREADSHEET_ID_GROUP.get("lcfa_users"), DATA.USER_TABLE_RANGE);
+        try {
+            if (InternetConnectionChecker.isInternetAvailable()) {
+                List<List<Object>> existingData = OnSheetWriter.readFromSheet(SPREADSHEETGROUP.get("lcfa_users"), DATA.USER_TABLE_RANGE);
                 if (existingData != null && !existingData.isEmpty()) {
                     for (List<Object> row : existingData) {
-                        if (row.get(8).toString().equals(userType)){
+                        if (row.size() > 8 && row.get(8).toString().equals(userType)) {
                             count++;
                         }
                     }
                 }
                 return count;
-            } catch (IOException | GeneralSecurityException e) {
-                throw new RuntimeException(e);
+            } else {
+                logger.warning("Internet connection is not available!");
+                return 0;
             }
-        } else {
-            System.err.println("Internet connection is not available!");
-            return 0;
+        } catch (IOException e) {
+            logger.warning("Error reading from the sheet: " + e.getMessage());
+            return -1;
         }
     }
 
+
     public boolean addCourse(Course course){
         List<Object> courseData = course.getAllDataAsList();
-        boolean result = addData(courseData, SPREADSHEET_ID_GROUP.get("lcfa_courses"), DATA.COURSE_TABLE_RANGE,"lcfa_courses");
+        boolean result = addData(courseData, SPREADSHEETGROUP.get("lcfa_courses"), DATA.COURSE_TABLE_RANGE,"lcfa_courses");
         if (result){
-            System.out.println("Added Course: " + course.getName());
+            logger.info("Added Course: " + course.getName());
         }
         else{
-            System.err.println("Error occurred at adding course.");
+            logger.warning("Error occurred at adding course.");
         }
         return result;
     }
 
-    public boolean addData(List<Object> newRow, String table_id, String table_range, String filename){
+    public boolean addData(List<Object> newRow, String tableID, String tableRange, String filename){
         List<List<Object>> existingData;
-        String filePath = DATA.DOWNLOAD_XLXS_FOLDER_PATH+"\\"+filename+".xlsx";
+        String filePath = DATA.DOWNLOAD_XLXS_FOLDER_PATH + File.separator + filename+".xlsx";
         if (InternetConnectionChecker.isInternetAvailable()){
             try {
-                existingData = OnSheetWriter.readFromSheet(table_id, table_range);
-            } catch (IOException | GeneralSecurityException e) {
-                LOGGER.log(Level.SEVERE, "An error occurred while fetching existing data from the sheet", e);
-                System.err.println("An error occurred while fetching existing data from the sheet.");
+                existingData = OnSheetWriter.readFromSheet(tableID, tableRange);
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "An error occurred while fetching existing data from the sheet", e);
                 return false;
             }
         } else{
             existingData = OffSheetWriter.readData(filePath);
         }
 
-        if (existingData != null && !existingData.isEmpty()) {
-            if (existingData.stream().anyMatch(row -> {
+        if (existingData != null && !existingData.isEmpty() &&  (existingData.stream().anyMatch(row -> {
                 List<Object> existingRowWithoutId = new ArrayList<>(row.subList(1, row.size()));
                 return existingRowWithoutId.equals(newRow);
-            })) {
-                System.out.println("Data already exists. Not adding duplicate entry.");
+            }))) {
+                logger.info("Data already exists. Not adding duplicate entry.");
                 return false;
-            }
+            
         }
         List<List<Object>> newData = new ArrayList<>();
         newData.add(newRow);
         try {
             OffSheetWriter.appendDataToFile(newData, filePath);
             if (InternetConnectionChecker.isInternetAvailable()){
-                OnSheetWriter.appendDataToSheet(newData, table_id, table_range);
+                OnSheetWriter.appendDataToSheet(newData, tableID, tableRange);
             }else{
-                System.out.println("No internet available to save the data on cloud!");
+                logger.info("No internet available to save the data on cloud!");
             }
-            System.out.println("Data added successfully to the sheet!");
+            logger.info("Data added successfully to the sheet!");
             return true;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "An error occurred while appending data to the sheet", e);
-            System.err.println("An error occurred while appending data to the sheet.");
+            logger.log(Level.SEVERE, "An error occurred while appending data to the sheet", e);
             return false;
         }
     }
@@ -212,14 +210,14 @@ public class Functions {
                 }
             }
         } catch (Exception e){
-            LOGGER.log(Level.SEVERE, "An error occurred while fetching users from the sheet", e);
+            logger.log(Level.SEVERE, "An error occurred while fetching users from the sheet", e);
         }
         return users;
     }
     public List<Course> getCoursesFromSheet() {
         List<Course> courses = new ArrayList<>();
         try {
-            String courseFile = System.getProperty(DATA.HOME) + DATA.FILE_PATH + "\\" + "lcfa_courses.xlsx";
+            String courseFile = System.getProperty(DATA.HOME) + DATA.FILE_PATH + File.separator + "lcfa_courses.xlsx";
             List<List<Object>> data = OffSheetWriter.readData(courseFile);
             if (data != null && !data.isEmpty()) {
                 for (List<Object> row : data) {
@@ -232,7 +230,7 @@ public class Functions {
                 }
             }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "An error occurred while fetching courses from the sheet", e);
+            logger.log(Level.SEVERE, "An error occurred while fetching courses from the sheet", e);
         }
         return courses;
     }
@@ -253,7 +251,7 @@ public class Functions {
                 spreadsheetId.put("lcfa_users", lcfaUsers);
                 spreadsheetId.put("lcfa_courses", lcfaCourses);
                 OnSheetWriter.writeSpreadsheetInfoToFile(spreadsheetId);
-                SPREADSHEET_ID_GROUP = OnSheetWriter.readSpreadsheetInfoFromFile();
+                SPREADSHEETGROUP = OnSheetWriter.readSpreadsheetInfoFromFile();
 
                 List<Object> userHeaderData = new ArrayList<>(List.of(
                         "id", "firstname", "lastname", "email",
@@ -265,7 +263,7 @@ public class Functions {
                     OnSheetWriter.headerAdd(userHeaderData, lcfaUsers, userAdjustRange.get(1));
                     OnSheetWriter.headerAdd(courseHeaderData, lcfaCourses, courseAdjustRange.get(1));
                 } catch (IOException e) {
-                    System.err.println("Error at adding header!");
+                    logger.warning("Error at adding header!");
                 }
                 OnSheetWriter.downloadFile("lcfa_users", lcfaUsers, DATA.USER_TABLE_RANGE);
                 OnSheetWriter.downloadFile("lcfa_courses", lcfaCourses, DATA.COURSE_TABLE_RANGE);
@@ -274,20 +272,20 @@ public class Functions {
                 User defaultUser = new User("admin", "admin", "admin@gmail.com", "admin2023", "09999999", "null", "home", "admin");
                 registerUser(defaultUser, false);
             } else {
-                System.out.println("Google Sheets or local files already exist. Skipping setup.");
-                SPREADSHEET_ID_GROUP = OnSheetWriter.readSpreadsheetInfoFromFile();
+                logger.info("Google Sheets or local files already exist. Skipping setup.");
+                SPREADSHEETGROUP = OnSheetWriter.readSpreadsheetInfoFromFile();
             }
         }else{
-            System.err.println("Please check your internet connection!");
+            logger.warning("Please check your internet connection!");
         }
     }
 
     public void downloadAll(){
         if (InternetConnectionChecker.isInternetAvailable()) {
-            OnSheetWriter.downloadFile("lcfa_users", SPREADSHEET_ID_GROUP.get("lcfa_users"), DATA.USER_TABLE_RANGE);
-            OnSheetWriter.downloadFile("lcfa_courses", SPREADSHEET_ID_GROUP.get("lcfa_courses"), DATA.COURSE_TABLE_RANGE);
+            OnSheetWriter.downloadFile("lcfa_users", SPREADSHEETGROUP.get("lcfa_users"), DATA.USER_TABLE_RANGE);
+            OnSheetWriter.downloadFile("lcfa_courses", SPREADSHEETGROUP.get("lcfa_courses"), DATA.COURSE_TABLE_RANGE);
         } else{
-            System.err.println("Please check your internet connection!");
+            logger.warning("Please check your internet connection!");
         }
     }
     
