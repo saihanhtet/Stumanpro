@@ -10,7 +10,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/19.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hanhtet.stumanpro.UserManagementController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="500.0"
+   xmlns="http://javafx.com/javafx/19.0.2"
+   xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.hanhtet.stumanpro.UserManagementController">
    <children>
       <VBox alignment="TOP_CENTER" layoutX="77.0" layoutY="69.0" prefHeight="149.0" prefWidth="400.0" spacing="10.0" style="-fx-padding: 10;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -34,7 +36,7 @@
             <ComboBox fx:id="userTypeInput" prefHeight="40.0" prefWidth="746.0" promptText="Select the User Type" style="-fx-padding: 5; -fx-font-size: 14;" />
             <Label prefHeight="17.0" prefWidth="590.0" text="Enter Address:" wrapText="true" />
             <TextArea fx:id="addressInput" prefHeight="150.0" prefWidth="480.0" />
-            <Button mnemonicParsing="false" onAction="#ADDUser" prefHeight="50.0" prefWidth="480.0" style="-fx-padding: 10;" text="Register" />
+            <Button mnemonicParsing="false" onAction="#addUser" prefHeight="50.0" prefWidth="480.0" style="-fx-padding: 10;" text="Register" />
          </children>
       </VBox>
    </children>

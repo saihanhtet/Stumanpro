@@ -1,23 +1,37 @@
 package com.hanhtet.stumanpro;
 
 import com.hanhtet.stumanpro.alert.CustomAlertBox;
+import com.hanhtet.stumanpro.entity.Course;
 import com.hanhtet.stumanpro.entity.User;
+import com.hanhtet.stumanpro.utils.CRUD;
 import com.hanhtet.stumanpro.utils.DATA;
 import com.hanhtet.stumanpro.utils.Functions;
 import com.hanhtet.stumanpro.utils.OffSheetWriter;
+import com.hanhtet.stumanpro.utils.UserSuggestionHandler;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 
@@ -80,15 +94,43 @@ public class UserManagementController {
   private TableView<User> userTable;
 
   @FXML
-  private ComboBox<User> userSelectionComboBox;
+  private Label userNameLabel;
+
+  @FXML
+  private VBox suggestionContainer;
+
+  @FXML
+  private TextField searchField;
+
+  @FXML
+  private ScrollPane scrollPane;
+
+  private User currentSelectedUser;
+
+  private UserSuggestionHandler<User> suggestionHandler;
+  private CRUD<User> crud;
+
+  private static final Logger logger = Logger.getLogger(DATA.APPLICATION_NAME);
 
   @FXML
   private void deleteUser(ActionEvent event) {
-    // add function to delete user
+    try {
+      if (crud.delete(currentSelectedUser)) {
+        logger.info("Successfully deleted the user!");
+        currentSelectedUser = null;
+        suggestionHandler.clearSearchSuggestions();
+        searchField.clear();
+        perfromSearchAction();
+      } else {
+        logger.warning("Can't delete the user.");
+      }
+    } catch (IOException e) {
+      logger.log(Level.WARNING, "Error occurred during at deleting user!", e);
+    }
   }
 
   @FXML
-  void ADDUser(ActionEvent event) {
+  void addUser(ActionEvent event) {
     User user = getUser();
     boolean result = functions.registerUser(user, true);
     if (result) {
@@ -174,7 +216,11 @@ public class UserManagementController {
         DATA.DOWNLOAD_XLXS_FOLDER_PATH + File.separator + "lcfa_users.xlsx"
       );
     } catch (Exception e) {
-      System.err.println("Something went wrong with editing the course!" + e);
+      logger.log(
+        Level.WARNING,
+        "Something went wrong with editing the course",
+        e
+      );
     }
   }
 
@@ -199,8 +245,69 @@ public class UserManagementController {
     );
   }
 
+  private ObservableList<User> performSearch(String searchText) {
+    List<User> allUsers = functions.getUsersFromSheet();
+    ObservableList<User> filteredUsers = FXCollections.observableArrayList();
+
+    for (User user : allUsers) {
+      if (
+        user.getName().toLowerCase().contains(searchText.toLowerCase()) ||
+        user.getEmail().toLowerCase().contains(searchText.toLowerCase()) ||
+        user.getId().toLowerCase().contains(searchText.toLowerCase())
+      ) {
+        filteredUsers.add(user);
+      }
+    }
+    return filteredUsers;
+  }
+
+  private void handleSuggestionClick(User selectedUser) {
+    userNameLabel.setText(
+      "You have selected the user: " + selectedUser.getName()
+    );
+    currentSelectedUser = selectedUser;
+    suggestionHandler.clearSearchSuggestions();
+
+    Label selectedLabel = new Label(selectedUser.getName());
+    selectedLabel.getStyleClass().add("label-suggestion");
+    selectedLabel.setMaxWidth(Double.MAX_VALUE);
+    selectedLabel.getStyleClass().add("selected-user-label");
+    suggestionContainer.getChildren().add(selectedLabel);
+    searchField.setText(selectedUser.getName().trim());
+  }
+
+  private void perfromSearchAction() {
+    try {
+      userNameLabel.setText("You haven't selected the user yet.");
+      suggestionHandler.populateSearchSuggestions(
+        performSearch(""),
+        this::handleSuggestionClick
+      );
+      searchField
+        .textProperty()
+        .addListener((observable, oldValue, newValue) -> {
+          if (!newValue.isEmpty()) {
+            ObservableList<User> filteredUsers = performSearch(newValue);
+            suggestionHandler.populateSearchSuggestions(
+              filteredUsers,
+              this::handleSuggestionClick
+            );
+          } else {
+            suggestionHandler.clearSearchSuggestions();
+            suggestionHandler.populateSearchSuggestions(
+              performSearch(""),
+              this::handleSuggestionClick
+            );
+          }
+        });
+    } catch (Exception e) {
+      logger.warning("User delete can't be loaded.");
+    }
+  }
+
   @FXML
   void initialize() {
+    crud = new CRUD<>();
     assert firstNameInput !=
     null : "fx:id=\"firstNameInput\" was not injected: check your FXML file 'user_add.fxml'.";
     assert lastNameInput !=
@@ -222,7 +329,7 @@ public class UserManagementController {
       );
       userTypeInput.setItems(userTypes);
     } catch (Exception e) {
-      System.err.println(e);
+      logger.warning("User add can't be loaded.");
     }
 
     try {
@@ -237,7 +344,15 @@ public class UserManagementController {
       userRole.setCellValueFactory(new PropertyValueFactory<>("role"));
       addDataTable();
     } catch (Exception e) {
-      System.err.println(e);
+      logger.warning("User Table can't be loaded.");
+    }
+
+    try {
+      suggestionHandler =
+        new UserSuggestionHandler(suggestionContainer, scrollPane);
+      perfromSearchAction();
+    } catch (Exception e) {
+      logger.warning("User delete can't be loaded.");
     }
   }
 }

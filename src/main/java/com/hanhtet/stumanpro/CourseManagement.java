@@ -2,31 +2,33 @@ package com.hanhtet.stumanpro;
 
 import com.hanhtet.stumanpro.alert.CustomAlertBox;
 import com.hanhtet.stumanpro.entity.Course;
+import com.hanhtet.stumanpro.utils.CRUD;
 import com.hanhtet.stumanpro.utils.DATA;
 import com.hanhtet.stumanpro.utils.Functions;
-import com.hanhtet.stumanpro.utils.InternetConnectionChecker;
 import com.hanhtet.stumanpro.utils.OffSheetWriter;
-import com.hanhtet.stumanpro.utils.OnSheetWriter;
-import com.hanhtet.stumanpro.utils.SheetUtils;
+import com.hanhtet.stumanpro.utils.UserSuggestionHandler;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.controlsfx.control.action.Action;
 
 public class CourseManagement {
 
@@ -57,30 +59,131 @@ public class CourseManagement {
   private TableView<Course> courseTable;
 
   @FXML
-  private ComboBox<Course> courseSelectionComboBox;
+  private VBox suggestionContainer;
+
+  @FXML
+  private TextField searchField;
+
+  @FXML
+  private ScrollPane scrollPane;
 
   @FXML
   private Label courseNameLabel;
 
-  @FXML
-  private Label coursePriceLabel;
+  private Course currentSelectedCourse;
+
+  private UserSuggestionHandler<Course> suggestionHandler = new UserSuggestionHandler<>(
+    suggestionContainer,
+    scrollPane
+  );
+
+  private CRUD<Course> crud;
+
+  private static final Logger logger = Logger.getLogger(DATA.APPLICATION_NAME);
 
   @FXML
   private void deleteCourse(ActionEvent event) {
-    Course selectedCourse = courseSelectionComboBox.getValue();
-    if (selectedCourse != null) {
-      try {
-        functions.deleteCourse(selectedCourse);
-        courseSelectionComboBox.setValue("Select the course");
-        changesInComboBox();
-        addCourseComboBox();
-        courseNameLabel.setText(null);
-        coursePriceLabel.setText(null);
-      } catch (IOException e) {
-        courseNameLabel.setText(null);
-        coursePriceLabel.setText(null);
+    try {
+      if (crud.delete(currentSelectedCourse)) {
+        logger.info("Successfully deleted the course!");
+        currentSelectedCourse = null;
+        suggestionHandler.clearSearchSuggestions();
+        searchField.clear();
+        perfromSearchAction(true);
+      } else {
+        logger.warning("Can't delete the course.");
+      }
+    } catch (IOException e) {
+      logger.log(Level.WARNING, "Error occurred during at deleting course!", e);
+    }
+  }
+
+  private ObservableList<Course> performSearch(String searchText) {
+    List<Course> allCourses = functions.getCoursesFromSheet();
+    ObservableList<Course> filteredCourses = FXCollections.observableArrayList();
+
+    for (Course course : allCourses) {
+      // Customize this condition based on your search criteria
+      if (
+        course.getName().toLowerCase().contains(searchText.toLowerCase()) ||
+        course.getId().toLowerCase().contains(searchText.toLowerCase())
+      ) {
+        filteredCourses.add(course);
       }
     }
+    return filteredCourses;
+  }
+
+  private void handleSuggestionClick(Course selectedCourse) {
+    courseNameLabel.setText(
+      "You have selected the course: " + selectedCourse.getName()
+    );
+    currentSelectedCourse = selectedCourse;
+    suggestionHandler.clearSearchSuggestions();
+
+    Label selectedLabel = new Label(selectedCourse.getName());
+    selectedLabel.getStyleClass().add("label-suggestion");
+    selectedLabel.setMaxWidth(Double.MAX_VALUE);
+    selectedLabel.getStyleClass().add("selected-course-label");
+    suggestionContainer.getChildren().add(selectedLabel);
+    searchField.setText(selectedCourse.getName().trim());
+  }
+
+  private void porpulateSuggestions(
+    ObservableList<Course> filteredCourses,
+    boolean empty
+  ) {
+    if (empty) {
+      suggestionHandler.populateSearchSuggestions(
+        performSearch(""),
+        this::handleSuggestionClick
+      );
+    } else {
+      suggestionHandler.populateSearchSuggestions(
+        filteredCourses,
+        this::handleSuggestionClick
+      );
+    }
+  }
+
+  private void perfromSearchAction(boolean deleteMethod) {
+    try {
+      if (deleteMethod) {
+        courseNameLabel.setText("You haven't selected the course yet.");
+      }
+      searchField
+        .textProperty()
+        .addListener((observable, oldValue, newValue) -> {
+          if (!newValue.isEmpty()) {
+            ObservableList<Course> filteredCourses = performSearch(newValue);
+            if (deleteMethod) {
+              porpulateSuggestions(filteredCourses, false);
+            } else {
+              courseTable.getItems().clear();
+              courseTable.getItems().addAll(filteredCourses);
+            }
+          } else {
+            if (deleteMethod) {
+              suggestionHandler.clearSearchSuggestions();
+              porpulateSuggestions(null, true);
+            } else {
+              reClearTable();
+            }
+          }
+        });
+    } catch (Exception e) {
+      logger.warning("Course delete can't be loaded.");
+    }
+  }
+
+  private void reClearTable() {
+    courseTable.getItems().clear();
+    addDataTable();
+  }
+
+  @FXML
+  private void clearTable(ActionEvent event) {
+    reClearTable();
   }
 
   @FXML
@@ -100,7 +203,7 @@ public class CourseManagement {
         primaryStage,
         "Course ADD Error",
         "Course can't add!",
-        "User don't have permission to add the course or Course might be already added!"
+        "Course don't have permission to add the course or Course might be already added!"
       );
     }
   }
@@ -147,62 +250,18 @@ public class CourseManagement {
         newData,
         DATA.DOWNLOAD_XLXS_FOLDER_PATH + "\\" + "lcfa_courses.xlsx"
       );
-      //SheetUtils.updateDataInSheet(updatedId, newData, DATA.courseTable_ID, DATA.courseTable_RANGE);
     } catch (Exception e) {
-      System.err.println("Something went wrong with editing the course!" + e);
-    }
-  }
-
-  private void addCourseComboBox() {
-    List<Course> coursesFromSheet = functions.getCoursesFromSheet();
-    if (coursesFromSheet != null && !coursesFromSheet.isEmpty()) {
-      courseSelectionComboBox.getItems().addAll(coursesFromSheet);
-      courseSelectionComboBox.setCellFactory(courseComboBox ->
-        new ListCell<Course>() {
-          @Override
-          protected void updateItem(Course item, boolean empty) {
-            super.updateItem(item, empty);
-            if (empty || item == null || item.getName() == null) {
-              setText(null);
-            } else {
-              setText(item.getName()); // Assuming getName() returns the course name
-            }
-          }
-        }
-      );
-      courseSelectionComboBox.setButtonCell(
-        new ListCell<>() {
-          @Override
-          protected void updateItem(Course item, boolean empty) {
-            super.updateItem(item, empty);
-            if (empty || item == null || item.getName() == null) {
-              setText(null);
-            } else {
-              setText(item.getName()); // Assuming getName() returns the course name
-            }
-          }
-        }
+      logger.log(
+        Level.WARNING,
+        "Something went wrong with the editing the course!",
+        e
       );
     }
-  }
-
-  private void changesInComboBox() {
-    courseSelectionComboBox
-      .valueProperty()
-      .addListener((observable, oldValue, selectedCourse) -> {
-        if (selectedCourse != null) {
-          courseNameLabel.setText(
-            "You have selected the course: " + selectedCourse.getName()
-          );
-          coursePriceLabel.setText(
-            "The course price is : " + selectedCourse.getPrice()
-          );
-        }
-      });
   }
 
   @FXML
   private void initialize() {
+    crud = new CRUD<>();
     assert courseInput !=
     null : "fx:id=\"courseInput\" was not injected: check your FXML file 'course_add.fxml'.";
     try {
@@ -210,16 +269,14 @@ public class CourseManagement {
       courseID.setCellValueFactory(new PropertyValueFactory<>("id"));
       coursePerPrice.setCellValueFactory(new PropertyValueFactory<>("price"));
       addDataTable();
+      perfromSearchAction(false);
     } catch (Exception e) {
-      System.err.println(e);
+      logger.warning("course table can't be loaded.");
     }
     try {
-      courseNameLabel.setText(null);
-      coursePriceLabel.setText(null);
-      addCourseComboBox();
-      changesInComboBox();
+      perfromSearchAction(true);
     } catch (Exception e) {
-      System.err.println(e);
+      logger.warning("Course delete can't be loaded.");
     }
   }
 }

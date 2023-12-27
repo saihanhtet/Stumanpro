@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
 
 public class Functions {
 
@@ -181,6 +183,20 @@ public class Functions {
     return OffSheetWriter.deleteDataById(
       course.getId(),
       DATA.DOWNLOAD_XLXS_FOLDER_PATH + "\\" + "lcfa_courses.xlsx"
+    );
+  }
+
+  public boolean deleteUser(User user) throws IOException {
+    if (InternetConnectionChecker.isInternetAvailable()) {
+      OnSheetWriter.deleteRowById(
+        user.getId(),
+        SPREADSHEETGROUP.get("lcfa_users"),
+        DATA.COURSE_TABLE_RANGE
+      );
+    }
+    return OffSheetWriter.deleteDataById(
+      user.getId(),
+      DATA.DOWNLOAD_XLXS_FOLDER_PATH + "\\" + "lcfa_users.xlsx"
     );
   }
 
@@ -416,6 +432,30 @@ public class Functions {
       );
     } else {
       logger.warning("Please check your internet connection!");
+    }
+  }
+
+  // from now on the fxml functions only
+
+  public <T> void addEntityComboBox(
+    List<T> objectFromSheet,
+    ComboBox<T> comboBox
+  ) {
+    if (objectFromSheet != null && !objectFromSheet.isEmpty()) {
+      comboBox.getItems().addAll(objectFromSheet);
+      comboBox.setCellFactory(entityComboBox ->
+        new ListCell<T>() {
+          @Override
+          protected void updateItem(T item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null || item.toString() == null) {
+              setText(null);
+            } else {
+              setText(item.toString());
+            }
+          }
+        }
+      );
     }
   }
 }

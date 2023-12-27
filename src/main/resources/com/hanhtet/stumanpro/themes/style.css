@@ -204,14 +204,64 @@
   -fx-background-color: -fx-primary;
 }
 
-.PushButton{
--fx-background-color: #ebedf3;
--fx-background-radius: 5;
--fx-border-width:1;
--fx-border-radius: 5;
--fx-border-color: #ebedf3;
+.PushButton {
+  -fx-background-color: #ebedf3;
+  -fx-background-radius: 5;
+  -fx-border-width: 1;
+  -fx-border-radius: 5;
+  -fx-border-color: #ebedf3;
 }
-.PushButton:hover{
--fx-border-color: -fx-primary;
--fx-text-fill: -fx-primary !important;
+.PushButton:hover {
+  -fx-border-color: -fx-primary;
+  -fx-text-fill: -fx-primary !important;
+}
+
+.label-suggestion {
+  -fx-text-fill: #333333;
+  -fx-font-size: 15px;
+  -fx-padding: 7;
+  -fx-border-style: solid;
+  -fx-border-color: #ccc;
+  -fx-border-radius: 5;
+  -fx-background-color: -fx-bg;
+  -fx-background-radius: 5;
+}
+
+.label-suggestion:hover {
+  -fx-font-weight: 600;
+  -fx-background-color: rgb(112, 112, 173);
+  -fx-text-fill: white;
+  -fx-background-radius: 10;
+}
+
+.suggestion-box {
+  -fx-background-color: transparent;
+  -fx-padding: 5;
+}
+
+.selected-user-label {
+  -fx-border-style: solid;
+  -fx-border-color: #ccc;
+  -fx-border-radius: 5;
+  -fx-background-color: -fx-bg;
+  -fx-background-radius: 5;
+  -fx-text-fill: #333333;
+  -fx-font-size: 15px;
+  -fx-padding: 7;
+  -fx-font-weight: 600;
+  -fx-background-color: rgb(112, 112, 173);
+  -fx-text-fill: white;
+  -fx-background-radius: 10;
+}
+
+.suggestion-pane {
+  -fx-border-style: solid;
+  -fx-border-color: #ccc;
+  -fx-border-radius: 5;
+  -fx-background-color: -fx-bg;
+  -fx-background-radius: 5;
+  -fx-font-size: 14;
+  -fx-font-weight: 600;
+  -fx-font-family: Aria;
+  -fx-text-fill: -fx-text;
 }
