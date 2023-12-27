@@ -7,11 +7,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.*;
+import java.util.logging.Level;
 
 public class CRUD<T> {
 
-  private static final Logger logger = Logger.getLogger(CRUD.class.getName());
   private static Map<String, String> SPREADSHEETGROUP = OnSheetWriter.readSpreadsheetInfoFromFile();
 
   public boolean createOrUpdateData(
@@ -29,7 +28,7 @@ public class CRUD<T> {
       try {
         existingData = OnSheetWriter.readFromSheet(tableID, tableRange);
       } catch (IOException e) {
-        logger.log(
+        LOG.logMe(
           Level.SEVERE,
           "Error reading existing data from the sheet",
           e
@@ -42,7 +41,7 @@ public class CRUD<T> {
 
     // Check for existing data and determine creation or update
     if (existingData != null && doesDataExist(entityData, existingData)) {
-      logger.info("Data already exists. Not adding duplicate entry.");
+      LOG.logInfo("Data already exists. Not adding duplicate entry.");
       return false;
     }
 
@@ -55,12 +54,12 @@ public class CRUD<T> {
       if (InternetConnectionChecker.isInternetAvailable()) {
         OnSheetWriter.appendDataToSheet(newData, tableID, tableRange);
       } else {
-        logger.info("No internet available to save the data on cloud!");
+        LOG.logInfo("No internet available to save the data on cloud!");
       }
-      logger.info("Data added/updated successfully to the sheet!");
+      LOG.logInfo("Data added/updated successfully to the sheet!");
       return true;
     } catch (IOException e) {
-      logger.log(Level.SEVERE, "Error appending/updating data to the sheet", e);
+      LOG.logMe(Level.SEVERE, "Error appending/updating data to the sheet", e);
       return false;
     }
   }
@@ -82,10 +81,12 @@ public class CRUD<T> {
   }
 
   public T getById(String id) {
+    LOG.logInfo(id);
     return null;
   }
 
   public boolean update(T entity) {
+    LOG.logInfo(entity);
     return false;
   }
 
@@ -94,7 +95,7 @@ public class CRUD<T> {
       OnSheetWriter.deleteRowById(
         getEntityId(entity),
         SPREADSHEETGROUP.get(getFileName(entity)),
-        DATA.COURSE_TABLE_RANGE
+        getRange(entity)
       );
     }
     return OffSheetWriter.deleteDataById(
@@ -106,15 +107,20 @@ public class CRUD<T> {
     );
   }
 
-  public List<T> getAll() {
-    return null;
-  }
-
   private String getFileName(T entity) {
     if (entity instanceof User) {
-      return ("lcfa_users");
+      return (DATA.LCFA_USER);
     } else if (entity instanceof Course) {
-      return ("lcfa_courses");
+      return (DATA.LCFA_COURSE);
+    }
+    return "";
+  }
+
+  private String getRange(T entity) {
+    if (entity instanceof User) {
+      return (DATA.USER_TABLE_RANGE);
+    } else if (entity instanceof Course) {
+      return (DATA.COURSE_TABLE_RANGE);
     }
     return "";
   }

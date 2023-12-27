@@ -15,12 +15,29 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.Permission;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.*;
-import java.io.*;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
+import com.google.api.services.sheets.v4.model.Request;
+import com.google.api.services.sheets.v4.model.SheetProperties;
+import com.google.api.services.sheets.v4.model.Spreadsheet;
+import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
+import com.google.api.services.sheets.v4.model.UpdateSheetPropertiesRequest;
+import com.google.api.services.sheets.v4.model.ValueRange;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.FileSystems;
 import java.security.GeneralSecurityException;
-import java.util.*;
-import java.util.logging.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -44,8 +61,6 @@ public class OnSheetWriter {
   private static final Sheets sheetService = getSheetsService();
   private static final Drive driveService = getDriveService();
 
-  private static final Logger logger = Logger.getLogger(DATA.APPLICATION_NAME);
-
   public static Sheets getSheetService() {
     return sheetService;
   }
@@ -63,13 +78,13 @@ public class OnSheetWriter {
         ObjectOutputStream objectOut = new ObjectOutputStream(fileOut)
       ) {
         objectOut.writeObject(spreadsheetInfo);
-        logger.info("Spreadsheet info successfully written to file.");
+        LOG.logInfo("Spreadsheet info successfully written to file.");
       } catch (IOException e) {
         e.printStackTrace();
-        logger.warning("Error occurred at writing the spreadsheet Id!");
+        LOG.logWarn("Error occurred at writing the spreadsheet Id!");
       }
     } else {
-      logger.info("Google sheet ID are already been added!");
+      LOG.logInfo("Google sheet ID are already been added!");
     }
   }
 
@@ -86,7 +101,7 @@ public class OnSheetWriter {
         spreadsheetInfo = (Map<String, String>) obj;
       }
     } catch (IOException | ClassNotFoundException e) {
-      logger.warning("Error occurred at reading the spreadsheet Id!");
+      LOG.logWarn("Error occurred at reading the spreadsheet Id!");
     }
     return spreadsheetInfo;
   }
@@ -158,7 +173,7 @@ public class OnSheetWriter {
       .append(spreadsheetId, range, body)
       .setValueInputOption("RAW")
       .execute();
-    logger.info("Header is successfully added!");
+    LOG.logInfo("Header is successfully added!");
   }
 
   public static Map<Integer, String> adjustRange(String range) {
@@ -219,16 +234,9 @@ public class OnSheetWriter {
         .append(spreadsheetId, rangeForAppend, body)
         .setValueInputOption("RAW")
         .execute();
-      logger.log(
-        Level.INFO,
-        "Data successfully appended to the sheet with ID: {0}",
-        newId
-      );
+      LOG.logInfo("Data successfully appended to the sheet with ID:" + newId);
     } catch (IOException e) {
-      logger.log(
-        Level.WARNING,
-        "An error occurred while appending data to the sheet."
-      );
+      LOG.logWarn("An error occurred while appending data to the sheet.");
     }
   }
 
@@ -259,19 +267,16 @@ public class OnSheetWriter {
             .update(spreadsheetId, range, body)
             .setValueInputOption("RAW")
             .execute();
-          logger.log(
-            Level.INFO,
-            "Row with ID {0} has been successfully deleted from the sheet.",
-            idToDelete
+          LOG.logInfo(
+            "Row with ID " +
+            idToDelete +
+            " has been successfully deleted from the sheet."
           );
         } catch (IOException e) {
-          logger.log(
-            Level.WARNING,
-            "An error occurred while deleting the row!"
-          );
+          LOG.logWarn("An error occurred while deleting the row!");
         }
       } else {
-        logger.log(Level.INFO, "ID {0} not found in the sheet.", idToDelete);
+        LOG.logInfo("ID " + idToDelete + " not found in the sheet.");
       }
     }
   }
@@ -304,19 +309,17 @@ public class OnSheetWriter {
             .update(spreadsheetId, range, body)
             .setValueInputOption("RAW")
             .execute();
-          logger.log(
-            Level.INFO,
-            "Data with ID {0} successfully updated in the sheet.",
-            idToUpdate
+          LOG.logInfo(
+            "Data with ID " + idToUpdate + " successfully updated in the sheet."
           );
         } catch (IOException e) {
-          logger.warning("An error occurred while updating data:");
+          LOG.logWarn("An error occurred while updating data:");
         }
       } else {
-        logger.log(Level.INFO, "ID {0} not found in the sheet.", idToUpdate);
+        LOG.logInfo("ID " + idToUpdate + " not found in the sheet.");
       }
     } else {
-      logger.info("No data found in the sheet.");
+      LOG.logWarn("No data found in the sheet.");
     }
   }
 
@@ -375,18 +378,18 @@ public class OnSheetWriter {
           if (!file.exists()) {
             file.getParentFile().mkdirs(); // Create parent directories if they don't exist
             OffSheetWriter.createSheet(sheetData, filePath, sheetName);
-            logger.info("Excel file created successfully!");
+            LOG.logInfo("Excel file created successfully!");
           } else {
-            logger.log(Level.SEVERE, "File already exists at: {0}", filePath);
+            LOG.logWarn("File already exists at: " + filePath);
           }
         } else {
-          logger.info("No data found in the sheet.");
+          LOG.logInfo("No data found in the sheet.");
         }
       } else {
-        logger.info("Retrieved data is not in the expected format");
+        LOG.logInfo("Retrieved data is not in the expected format");
       }
     } catch (IOException | GeneralSecurityException e) {
-      logger.warning("Error occurred while downloading data from the sheet.");
+      LOG.logWarn("Error occurred while downloading data from the sheet.");
     }
   }
 
@@ -406,7 +409,7 @@ public class OnSheetWriter {
     }
 
     String spreadsheetId = spreadsheet.getSpreadsheetId();
-    logger.log(Level.INFO, "Created new spreadsheet named: {0}", sheetName);
+    LOG.logInfo("Created new spreadsheet named: " + sheetName);
 
     try {
       BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest();
@@ -425,7 +428,7 @@ public class OnSheetWriter {
         .batchUpdate(spreadsheetId, batchUpdateRequest)
         .execute();
     } catch (IOException e) {
-      logger.warning("Error updating sheet title: " + e.getMessage());
+      LOG.logWarn("Error updating sheet title: " + e.getMessage());
     }
 
     // Set the permission to allow anyone with the link to edit
@@ -438,7 +441,7 @@ public class OnSheetWriter {
     try {
       driveService.permissions().create(spreadsheetId, newPermission).execute();
     } catch (IOException e) {
-      logger.warning("Can't add data in this create file instance!");
+      LOG.logWarn("Can't add data in this create file instance!");
     }
     return spreadsheetId;
   }
@@ -457,12 +460,12 @@ public class OnSheetWriter {
       List<List<Object>> localData = OffSheetWriter.readData(filePath);
       if (!newData.equals(localData)) {
         updateLocalFile(newData, filePath); // Update local file with new data
-        logger.info("Local file updated successfully.");
+        LOG.logInfo("Local file updated successfully.");
       } else {
-        logger.info("Local file is already up-to-date.");
+        LOG.logInfo("Local file is already up-to-date.");
       }
     } catch (IOException | GeneralSecurityException e) {
-      logger.warning("Error occurred while syncing: " + e);
+      LOG.logWarn("Error occurred while syncing: " + e);
     }
   }
 
@@ -483,12 +486,12 @@ public class OnSheetWriter {
       List<List<Object>> localData = OffSheetWriter.readData(filePath);
       if (!newData.equals(localData)) {
         updateGoogleSheet(localData, tableId, tableRange);
-        logger.info("Google Sheet file updated successfully.");
+        LOG.logInfo("Google Sheet file updated successfully.");
       } else {
-        logger.info("Google Sheet file is already up-to-date.");
+        LOG.logInfo("Google Sheet file is already up-to-date.");
       }
     } catch (IOException | GeneralSecurityException e) {
-      logger.warning("Error occurred while syncing:" + e);
+      LOG.logWarn("Error occurred while syncing:" + e);
     }
   }
 
@@ -506,7 +509,7 @@ public class OnSheetWriter {
         .setValueInputOption("RAW")
         .execute();
     } catch (IOException e) {
-      logger.warning("Error occurred while updating Google Sheet: " + e);
+      LOG.logWarn("Error occurred while updating Google Sheet: " + e);
     }
   }
 
@@ -514,31 +517,28 @@ public class OnSheetWriter {
     List<List<Object>> newData,
     String filePath
   ) {
-    Workbook workbook = new XSSFWorkbook();
-    Sheet sheet = workbook.createSheet("Sheet1"); // Create a new sheet
-
-    int rowNum = 0;
-    for (List<Object> rowData : newData) {
-      Row row = sheet.createRow(rowNum++);
-      int colNum = 0;
-      for (Object field : rowData) {
-        Cell cell = row.createCell(colNum++);
-        if (field instanceof String) {
-          cell.setCellValue((String) field);
-        } else if (field instanceof Integer) {
-          cell.setCellValue((Integer) field);
+    try (Workbook workbook = new XSSFWorkbook()) {
+      Sheet sheet = workbook.createSheet("Sheet1");
+      int rowNum = 0;
+      for (List<Object> rowData : newData) {
+        Row row = sheet.createRow(rowNum++);
+        int colNum = 0;
+        for (Object field : rowData) {
+          Cell cell = row.createCell(colNum++);
+          if (field instanceof String) {
+            cell.setCellValue((String) field);
+          } else if (field instanceof Integer) {
+            cell.setCellValue((Integer) field);
+          }
         }
       }
-    }
 
-    FileOutputStream outputStream;
-    try {
+      FileOutputStream outputStream;
       outputStream = new FileOutputStream(filePath);
       workbook.write(outputStream);
-      workbook.close();
       outputStream.close();
-    } catch (IOException e) {
-      logger.warning("File not found error while syncing: " + e);
+    } catch (Exception e) {
+      LOG.logWarn("error occurred!" + e.getMessage());
     }
   }
 

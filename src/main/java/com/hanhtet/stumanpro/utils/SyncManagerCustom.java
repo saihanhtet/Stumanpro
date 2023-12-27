@@ -8,7 +8,7 @@ public class SyncManagerCustom {
     throw new IllegalStateException("Sync Manager Custom class");
   }
 
-  public static boolean AutoSyncData() {
+  public static boolean autoSyncData() {
     boolean isInternet = InternetConnectionChecker.isInternetAvailable();
     if (isInternet) {
       try {
@@ -24,33 +24,31 @@ public class SyncManagerCustom {
           DATA.COURSE_TABLE_RANGE
         );
       } catch (Exception e) {
-        System.err.println("Error at syncing offline");
+        LOG.logWarn("Error at syncing offline");
       }
     }
     return isInternet;
   }
 
-  public static boolean SyncFromOnline() {
+  public static boolean syncFromOnline() {
     boolean isInternet = InternetConnectionChecker.isInternetAvailable();
     if (isInternet) {
       try {
         Functions functions = new Functions();
         functions.downloadAll();
       } catch (Exception e) {
-        System.err.println("Error at syncing online");
+        LOG.logWarn("Error at syncing online");
       }
     }
     return isInternet;
   }
 
   public static boolean startAutoSync() {
-    boolean syncData = AutoSyncData();
+    boolean syncData = autoSyncData();
     if (syncData) {
-      System.out.println("Successfully synced!");
+      LOG.logInfo("Successfully synced!");
     } else {
-      System.err.println(
-        "An error occurred while syncing courses from the sheet."
-      );
+      LOG.logWarn("An error occurred while syncing courses from the sheet.");
     }
     return syncData;
   }

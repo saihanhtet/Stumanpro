@@ -7,7 +7,8 @@ package com.hanhtet.stumanpro;
  */
 
 public class MainApplication {
-    public static void main(String[] args) {
-        GUI.launch(GUI.class, args);
-    }
+
+  public static void main(String[] args) {
+    GUI.launch(GUI.class, args);
+  }
 }

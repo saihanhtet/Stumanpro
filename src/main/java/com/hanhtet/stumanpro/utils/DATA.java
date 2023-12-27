@@ -22,6 +22,11 @@ public class DATA {
   public static final String DOWNLOAD_XLXS_FOLDER_PATH;
   public static final String HOME = "user.home";
 
+  public static final String LCFA_COURSE = "lcfa_courses";
+  public static final String LCFA_USER = "lcfa_users";
+
+  public static final String EXTENSION = ".xlsx";
+
   static {
     TOKENS_DIRECTORY_PATH = System.getProperty(DATA.HOME) + DATA.TOKEN_PATH;
     DOWNLOAD_XLXS_FOLDER_PATH = System.getProperty(DATA.HOME) + DATA.FILE_PATH;

@@ -113,6 +113,6 @@ public class LoginController {
     assert passwordInput !=
     null : "fx:id=\"passwordInput\" was not injected: check your FXML file 'Login.fxml'.";
     functions = new Functions();
-    functions.InitializeProject();
+    functions.initializeProject();
   }
 }

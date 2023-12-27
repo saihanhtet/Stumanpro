@@ -5,6 +5,7 @@ import com.hanhtet.stumanpro.entity.Course;
 import com.hanhtet.stumanpro.utils.CRUD;
 import com.hanhtet.stumanpro.utils.DATA;
 import com.hanhtet.stumanpro.utils.Functions;
+import com.hanhtet.stumanpro.utils.LOG;
 import com.hanhtet.stumanpro.utils.OffSheetWriter;
 import com.hanhtet.stumanpro.utils.UserSuggestionHandler;
 import java.io.IOException;
@@ -13,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -77,24 +77,22 @@ public class CourseManagement {
     scrollPane
   );
 
-  private CRUD<Course> crud;
-
-  private static final Logger logger = Logger.getLogger(DATA.APPLICATION_NAME);
+  private CRUD<Course> crud = new CRUD<>();
 
   @FXML
   private void deleteCourse(ActionEvent event) {
     try {
       if (crud.delete(currentSelectedCourse)) {
-        logger.info("Successfully deleted the course!");
+        LOG.logInfo("Successfully deleted the course!");
         currentSelectedCourse = null;
         suggestionHandler.clearSearchSuggestions();
         searchField.clear();
         perfromSearchAction(true);
       } else {
-        logger.warning("Can't delete the course.");
+        LOG.logWarn("Can't delete the course.");
       }
     } catch (IOException e) {
-      logger.log(Level.WARNING, "Error occurred during at deleting course!", e);
+      LOG.logMe(Level.WARNING, "Error occurred during at deleting course!", e);
     }
   }
 
@@ -172,7 +170,7 @@ public class CourseManagement {
           }
         });
     } catch (Exception e) {
-      logger.warning("Course delete can't be loaded.");
+      LOG.logWarn("Course delete can't be loaded.");
     }
   }
 
@@ -251,7 +249,7 @@ public class CourseManagement {
         DATA.DOWNLOAD_XLXS_FOLDER_PATH + "\\" + "lcfa_courses.xlsx"
       );
     } catch (Exception e) {
-      logger.log(
+      LOG.logMe(
         Level.WARNING,
         "Something went wrong with the editing the course!",
         e
@@ -261,7 +259,6 @@ public class CourseManagement {
 
   @FXML
   private void initialize() {
-    crud = new CRUD<>();
     assert courseInput !=
     null : "fx:id=\"courseInput\" was not injected: check your FXML file 'course_add.fxml'.";
     try {
@@ -271,12 +268,12 @@ public class CourseManagement {
       addDataTable();
       perfromSearchAction(false);
     } catch (Exception e) {
-      logger.warning("course table can't be loaded.");
+      LOG.logWarn("course table can't be loaded.");
     }
     try {
       perfromSearchAction(true);
     } catch (Exception e) {
-      logger.warning("Course delete can't be loaded.");
+      LOG.logWarn("Course delete can't be loaded.");
     }
   }
 }

@@ -3,6 +3,7 @@ package com.hanhtet.stumanpro;
 import com.hanhtet.stumanpro.alert.CustomAlertBox;
 import com.hanhtet.stumanpro.utils.DATA;
 import com.hanhtet.stumanpro.utils.Functions;
+import com.hanhtet.stumanpro.utils.LOG;
 import com.hanhtet.stumanpro.utils.SyncManagerCustom;
 import com.hanhtet.stumanpro.utils.UserSession;
 import java.io.IOException;
@@ -285,7 +286,7 @@ public class MainWindowController {
         "Check your internet connection and try again. If not contact the Developer!"
       );
     } else {
-      System.out.println("Successfully synced!");
+      LOG.logInfo("Successfully synced!");
     }
   }
 
@@ -296,6 +297,7 @@ public class MainWindowController {
         return functions.countUser("student");
       }
     };
+
     countStudentsTask.setOnSucceeded(e -> {
       studentCount.setText(countStudentsTask.getValue().toString());
     });

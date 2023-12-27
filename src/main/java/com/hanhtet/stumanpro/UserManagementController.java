@@ -1,11 +1,11 @@
 package com.hanhtet.stumanpro;
 
 import com.hanhtet.stumanpro.alert.CustomAlertBox;
-import com.hanhtet.stumanpro.entity.Course;
 import com.hanhtet.stumanpro.entity.User;
 import com.hanhtet.stumanpro.utils.CRUD;
 import com.hanhtet.stumanpro.utils.DATA;
 import com.hanhtet.stumanpro.utils.Functions;
+import com.hanhtet.stumanpro.utils.LOG;
 import com.hanhtet.stumanpro.utils.OffSheetWriter;
 import com.hanhtet.stumanpro.utils.UserSuggestionHandler;
 import java.io.File;
@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -108,24 +107,22 @@ public class UserManagementController {
   private User currentSelectedUser;
 
   private UserSuggestionHandler<User> suggestionHandler;
-  private CRUD<User> crud;
-
-  private static final Logger logger = Logger.getLogger(DATA.APPLICATION_NAME);
+  private CRUD<User> crud = new CRUD<>();
 
   @FXML
   private void deleteUser(ActionEvent event) {
     try {
       if (crud.delete(currentSelectedUser)) {
-        logger.info("Successfully deleted the user!");
+        LOG.logInfo("Successfully deleted the user!");
         currentSelectedUser = null;
         suggestionHandler.clearSearchSuggestions();
         searchField.clear();
-        perfromSearchAction();
+        perfromSearchAction(true);
       } else {
-        logger.warning("Can't delete the user.");
+        LOG.logWarn("Can't delete the user.");
       }
     } catch (IOException e) {
-      logger.log(Level.WARNING, "Error occurred during at deleting user!", e);
+      LOG.logMe(Level.WARNING, "Error occurred during at deleting user!", e);
     }
   }
 
@@ -216,7 +213,7 @@ public class UserManagementController {
         DATA.DOWNLOAD_XLXS_FOLDER_PATH + File.separator + "lcfa_users.xlsx"
       );
     } catch (Exception e) {
-      logger.log(
+      LOG.logMe(
         Level.WARNING,
         "Something went wrong with editing the course",
         e
@@ -231,7 +228,7 @@ public class UserManagementController {
     String email = emailInput.getText();
     String passString = "P@ssw0rd2006";
     String phString = phonoInput.getText();
-    String address = (String) addressInput.getText();
+    String address = addressInput.getText();
     String userType = userTypeInput.getValue().toLowerCase();
     return new User(
       firstname,
@@ -261,6 +258,23 @@ public class UserManagementController {
     return filteredUsers;
   }
 
+  private void porpulateSuggestions(
+    ObservableList<User> filteredUsers,
+    boolean empty
+  ) {
+    if (empty) {
+      suggestionHandler.populateSearchSuggestions(
+        performSearch(""),
+        this::handleSuggestionClick
+      );
+    } else {
+      suggestionHandler.populateSearchSuggestions(
+        filteredUsers,
+        this::handleSuggestionClick
+      );
+    }
+  }
+
   private void handleSuggestionClick(User selectedUser) {
     userNameLabel.setText(
       "You have selected the user: " + selectedUser.getName()
@@ -276,38 +290,43 @@ public class UserManagementController {
     searchField.setText(selectedUser.getName().trim());
   }
 
-  private void perfromSearchAction() {
+  private void perfromSearchAction(boolean deleteMethod) {
     try {
-      userNameLabel.setText("You haven't selected the user yet.");
-      suggestionHandler.populateSearchSuggestions(
-        performSearch(""),
-        this::handleSuggestionClick
-      );
+      if (deleteMethod) {
+        userNameLabel.setText("You haven't selected the user yet.");
+      }
       searchField
         .textProperty()
         .addListener((observable, oldValue, newValue) -> {
           if (!newValue.isEmpty()) {
             ObservableList<User> filteredUsers = performSearch(newValue);
-            suggestionHandler.populateSearchSuggestions(
-              filteredUsers,
-              this::handleSuggestionClick
-            );
+            if (deleteMethod) {
+              porpulateSuggestions(filteredUsers, false);
+            } else {
+              userTable.getItems().clear();
+              userTable.getItems().addAll(filteredUsers);
+            }
           } else {
-            suggestionHandler.clearSearchSuggestions();
-            suggestionHandler.populateSearchSuggestions(
-              performSearch(""),
-              this::handleSuggestionClick
-            );
+            if (deleteMethod) {
+              suggestionHandler.clearSearchSuggestions();
+              porpulateSuggestions(null, true);
+            } else {
+              reClearTable();
+            }
           }
         });
     } catch (Exception e) {
-      logger.warning("User delete can't be loaded.");
+      LOG.logWarn("User delete can't be loaded.");
     }
+  }
+
+  private void reClearTable() {
+    userTable.getItems().clear();
+    addDataTable();
   }
 
   @FXML
   void initialize() {
-    crud = new CRUD<>();
     assert firstNameInput !=
     null : "fx:id=\"firstNameInput\" was not injected: check your FXML file 'user_add.fxml'.";
     assert lastNameInput !=
@@ -321,6 +340,8 @@ public class UserManagementController {
     assert addressInput !=
     null : "fx:id=\"addressInput\" was not injected: check your FXML file 'user_add.fxml'.";
 
+    suggestionHandler =
+      new UserSuggestionHandler<>(suggestionContainer, scrollPane);
     try {
       ObservableList<String> userTypes = FXCollections.observableArrayList(
         "Admin",
@@ -329,7 +350,7 @@ public class UserManagementController {
       );
       userTypeInput.setItems(userTypes);
     } catch (Exception e) {
-      logger.warning("User add can't be loaded.");
+      LOG.logWarn("User add can't be loaded.");
     }
 
     try {
@@ -343,16 +364,15 @@ public class UserManagementController {
       userADDR.setCellValueFactory(new PropertyValueFactory<>("address"));
       userRole.setCellValueFactory(new PropertyValueFactory<>("role"));
       addDataTable();
+      perfromSearchAction(false);
     } catch (Exception e) {
-      logger.warning("User Table can't be loaded.");
+      LOG.logWarn("User Table can't be loaded.");
     }
 
     try {
-      suggestionHandler =
-        new UserSuggestionHandler(suggestionContainer, scrollPane);
-      perfromSearchAction();
+      perfromSearchAction(true);
     } catch (Exception e) {
-      logger.warning("User delete can't be loaded.");
+      LOG.logWarn("User delete can't be loaded.");
     }
   }
 }

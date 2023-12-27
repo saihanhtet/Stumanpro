@@ -5,8 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -17,42 +17,42 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class OffSheetWriter {
 
+  private OffSheetWriter() {
+    throw new IllegalStateException("Offline sheet writer class");
+  }
+
   public static void createSheet(
     List<List<Object>> data,
     String filePath,
     String sheetName
   ) {
-    Workbook workbook = new XSSFWorkbook();
-    org.apache.poi.ss.usermodel.Sheet sheet = workbook.createSheet(sheetName);
-
-    int rowNum = 0;
-    for (List<Object> rowData : data) {
-      Row row = sheet.createRow(rowNum++);
-      int colNum = 0;
-      for (Object field : rowData) {
-        Cell cell = row.createCell(colNum++);
-        if (field instanceof String) {
-          cell.setCellValue((String) field);
-        } else if (field instanceof Integer) {
-          cell.setCellValue((Integer) field);
-        }
-      }
-    }
-
+    Workbook workbook;
+    org.apache.poi.ss.usermodel.Sheet sheet;
     try {
-      File file = new File(filePath);
-      if (!file.exists()) {
-        file.getParentFile().mkdirs(); // Create parent directories if they don't exist
-        try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
-          workbook.write(outputStream);
+      workbook = new XSSFWorkbook();
+      sheet = workbook.createSheet(sheetName);
+      int rowNum = 0;
+      for (List<Object> rowData : data) {
+        Row row = sheet.createRow(rowNum++);
+        int colNum = 0;
+        for (Object field : rowData) {
+          Cell cell = row.createCell(colNum++);
+          setCellValue(cell, field);
         }
-        workbook.close();
-        System.out.println("Excel file created successfully!");
-      } else {
-        System.out.println("File already exists at: " + filePath);
+        File file = new File(filePath);
+        if (!file.exists()) {
+          file.getParentFile().mkdirs(); // Create parent directories if they don't exist
+          try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
+            workbook.write(outputStream);
+          }
+          workbook.close();
+          LOG.logInfo("Excel file created successfully!");
+        } else {
+          LOG.logInfo("File already exist at: " + filePath);
+        }
       }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    } catch (Exception e) {
+      LOG.logMe(Level.WARNING, "workbook create error", e);
     }
   }
 
@@ -61,8 +61,7 @@ public class OffSheetWriter {
     String filePath
   ) {
     try {
-      FileInputStream fileInputStream = new FileInputStream(filePath);
-      Workbook workbook = new XSSFWorkbook(fileInputStream);
+      Workbook workbook = openWorkbook(filePath);
       Sheet sheet = workbook.getSheetAt(0); // Assuming the data is in the first sheet
       int lastRowNum = sheet.getLastRowNum();
       int lastID = 0;
@@ -77,42 +76,34 @@ public class OffSheetWriter {
           }
         }
       }
-      System.out.println("Last ID number: " + lastID);
       for (List<Object> rowData : newData) {
         Row row = sheet.createRow(++lastID);
         int colCount = 0;
         List<Object> newRowData = new ArrayList<>();
         newRowData.add(lastID);
         newRowData.addAll(rowData);
-        System.out.println(newRowData);
         for (Object field : newRowData) {
           Cell cell = row.createCell(colCount++);
-          if (field instanceof String) {
-            cell.setCellValue((String) field);
-          } else if (field instanceof Integer) {
-            cell.setCellValue((Integer) field);
-          } else if (field instanceof Double) {
-            cell.setCellValue((Double) field);
-          }
+          setCellValue(cell, field);
         }
       }
       FileOutputStream outputStream = new FileOutputStream(filePath);
       workbook.write(outputStream);
       workbook.close();
       outputStream.close();
-      System.out.println("Data successfully appended to the local file.");
+      LOG.logInfo("Data successfully appended to the local file.");
     } catch (IOException e) {
-      System.err.println(
-        "Error occurred while appending data to the local file: " +
-        e.getMessage()
+      LOG.logMe(
+        Level.WARNING,
+        "Error occurred while appending data to the local file: ",
+        e
       );
     }
   }
 
   public static boolean deleteDataById(String id, String filePath) {
     try {
-      FileInputStream fileInputStream = new FileInputStream(filePath);
-      Workbook workbook = new XSSFWorkbook(fileInputStream);
+      Workbook workbook = openWorkbook(filePath);
       Sheet sheet = workbook.getSheetAt(0);
       int columnIndexToDelete = 0;
       boolean flag = false;
@@ -124,7 +115,7 @@ public class OffSheetWriter {
             double cellValue = cell.getNumericCellValue();
             int intValue = (int) cellValue;
             if (intValue == Integer.parseInt(id)) {
-              System.out.println("Found matching cell: " + cellValue);
+              LOG.logInfo("Found matching cell: " + cellValue);
               sheet.removeRow(row);
               flag = true;
               break;
@@ -132,25 +123,22 @@ public class OffSheetWriter {
           }
         }
       }
-      fileInputStream.close();
       if (flag) {
         FileOutputStream outputStream = new FileOutputStream(filePath);
         workbook.write(outputStream);
         workbook.close();
         outputStream.close();
-        System.out.println(
-          "Row with id " + id + " deleted from the local file."
-        );
+        LOG.logInfo("Row with id " + id + " deleted from the local file.");
         return true;
       } else {
-        System.out.println(
-          "Row with id " + id + " not found in the local file."
-        );
+        LOG.logWarn("Row with id " + id + " not found in the local file.");
       }
-    } catch (IOException e) {
-      System.err.println(
-        "Error occurred while deleting row from the local file: " +
-        e.getMessage()
+      workbook.close();
+    } catch (Exception e) {
+      LOG.logMe(
+        Level.WARNING,
+        "Error occurred while deleting row from the local file: ",
+        e
       );
     }
     return false;
@@ -162,101 +150,125 @@ public class OffSheetWriter {
     String filePath
   ) {
     try {
-      FileInputStream fileInputStream = new FileInputStream(filePath);
-      Workbook workbook = new XSSFWorkbook(fileInputStream);
-      Sheet sheet = workbook.getSheetAt(0);
-      int columnIndexToUpdate = 0;
-      for (Row row : sheet) {
-        Cell cell = row.getCell(columnIndexToUpdate);
-        if (cell != null && cell.getCellType() == CellType.NUMERIC) {
-          double cellValue = cell.getNumericCellValue();
-          int intValue = (int) cellValue;
-          if (intValue == Integer.parseInt(id)) {
-            System.out.println("Found matching cell: " + cellValue);
-            int colNum = 0;
-            for (Object field : newData) {
-              Cell existingCell = row.getCell(colNum);
-              if (existingCell == null) {
-                existingCell = row.createCell(colNum);
-              }
-              if (field instanceof String) {
-                existingCell.setCellValue((String) field);
-              } else if (field instanceof Integer) {
-                existingCell.setCellValue((Integer) field);
-              } else if (field instanceof Double) {
-                existingCell.setCellValue((Double) field);
-              }
-              colNum++;
-            }
-            break;
-          }
+      Workbook workbook = openWorkbook(filePath);
+      if (workbook != null) {
+        Sheet sheet = workbook.getSheetAt(0);
+        updateData(sheet, id, newData);
+        saveWorkbook(workbook, filePath);
+        LOG.logInfo("Data successfully updated in the local file.");
+      }
+    } catch (Exception e) {
+      LOG.logMe(Level.WARNING, "Error occurred while updating data: ", e);
+    }
+  }
+
+  private static void updateData(Sheet sheet, String id, List<Object> newData) {
+    int columnIndexToUpdate = 0;
+    for (Row row : sheet) {
+      Cell cell = row.getCell(columnIndexToUpdate);
+      if (cell != null && cell.getCellType() == CellType.NUMERIC) {
+        double cellValue = cell.getNumericCellValue();
+        int intValue = (int) cellValue;
+        if (intValue == Integer.parseInt(id)) {
+          LOG.logInfo("Found matching cell: " + cellValue);
+          updateRow(row, newData);
+          break;
         }
       }
+    }
+  }
 
-      fileInputStream.close();
-      FileOutputStream outputStream = new FileOutputStream(filePath);
+  private static void updateRow(Row row, List<Object> newData) {
+    int colNum = 0;
+    for (Object field : newData) {
+      Cell existingCell = row.getCell(colNum);
+      if (existingCell == null) {
+        existingCell = row.createCell(colNum);
+      }
+      setCellValue(existingCell, field);
+      colNum++;
+    }
+  }
+
+  private static Workbook openWorkbook(String filePath) {
+    try (FileInputStream fileInputStream = new FileInputStream(filePath)) {
+      return new XSSFWorkbook(fileInputStream);
+    } catch (IOException e) {
+      LOG.logWarn("can't open workbook: " + filePath);
+    }
+    return null;
+  }
+
+  private static void setCellValue(Cell cell, Object field) {
+    if (field instanceof String) {
+      cell.setCellValue((String) field);
+    } else if (field instanceof Integer) {
+      cell.setCellValue((Integer) field);
+    } else if (field instanceof Double) {
+      cell.setCellValue((Double) field);
+    }
+  }
+
+  private static void saveWorkbook(Workbook workbook, String filePath) {
+    try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
       workbook.write(outputStream);
       outputStream.flush();
-      outputStream.close();
-      workbook.close();
-      System.out.println("Data successfully updated in the local file.");
-    } catch (IOException e) {
-      System.err.println(
-        "Error occurred while updating data in the local file: " +
-        e.getMessage()
-      );
+    } catch (Exception e) {
+      LOG.logWarn("Can't save workbook: " + filePath);
     }
   }
 
   public static List<List<Object>> readData(String filePath) {
-    try {
-      FileInputStream fileInputStream = new FileInputStream(filePath);
-      Workbook workbook = new XSSFWorkbook(fileInputStream);
+    List<List<Object>> data = new ArrayList<>();
+
+    try (Workbook workbook = openWorkbook(filePath)) {
       Sheet sheet = workbook.getSheetAt(0);
-      List<List<Object>> data = convertSheetToList(sheet);
+      data = convertSheetToList(sheet);
       data.remove(0);
-      workbook.close();
-      fileInputStream.close();
-      return data;
-    } catch (Exception e) {
-      System.err.println("File not found error while reading data: " + e);
+    } catch (IOException e) {
+      LOG.logWarn("File not found error while reading data: " + e);
     }
-    return null;
+
+    return data;
   }
 
   public static List<List<Object>> convertSheetToList(Sheet sheet) {
     List<List<Object>> data = new ArrayList<>();
     for (Row row : sheet) {
-      Iterator<Cell> cellIterator = row.cellIterator();
-      List<Object> rowData = new ArrayList<>();
-      while (cellIterator.hasNext()) {
-        Cell cell = cellIterator.next();
-        switch (cell.getCellType()) {
-          case STRING:
-            rowData.add(cell.getStringCellValue());
-            break;
-          case NUMERIC:
-            if (DateUtil.isCellDateFormatted(cell)) {
-              rowData.add(cell.getDateCellValue());
-            } else {
-              if (
-                cell.getNumericCellValue() == (int) cell.getNumericCellValue()
-              ) {
-                rowData.add((int) cell.getNumericCellValue());
-              } else {
-                rowData.add(cell.getNumericCellValue());
-              }
-            }
-            break;
-          case BOOLEAN:
-            rowData.add(cell.getBooleanCellValue());
-            break;
-          default:
-            rowData.add("");
-        }
-      }
+      List<Object> rowData = convertRowToList(row);
       data.add(rowData);
     }
     return data;
+  }
+
+  private static List<Object> convertRowToList(Row row) {
+    List<Object> rowData = new ArrayList<>();
+    for (Cell cell : row) {
+      Object cellValue = getCellValue(cell);
+      rowData.add(cellValue);
+    }
+    return rowData;
+  }
+
+  private static Object getCellValue(Cell cell) {
+    switch (cell.getCellType()) {
+      case STRING:
+        return cell.getStringCellValue();
+      case NUMERIC:
+        if (DateUtil.isCellDateFormatted(cell)) {
+          return cell.getDateCellValue();
+        } else {
+          double numericCellValue = cell.getNumericCellValue();
+          if (numericCellValue == (int) numericCellValue) {
+            return (int) numericCellValue;
+          } else {
+            return numericCellValue;
+          }
+        }
+      case BOOLEAN:
+        return cell.getBooleanCellValue();
+      default:
+        return "";
+    }
   }
 }

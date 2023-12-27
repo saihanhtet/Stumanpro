@@ -15,11 +15,11 @@ public class SetupUtils {
 
   static {
     SETUP_FLAG_FILE =
-      System.getProperty("user.home") + "/.stumanpro/setup_flag.txt";
+      System.getProperty(DATA.HOME) + "/.stumanpro/setup_flag.txt";
     GOOGLE_SHEETS_DIRECTORY =
-      System.getProperty("user.home") + "/.stumanpro/sheetId";
+      System.getProperty(DATA.HOME) + "/.stumanpro/sheetId";
     LOCAL_FILES_DIRECTORY =
-      System.getProperty("user.home") + "/.stumanpro/tables";
+      System.getProperty(DATA.HOME) + "/.stumanpro/tables";
   }
 
   public static boolean checkIfGoogleSheetsExist() {
@@ -46,24 +46,22 @@ public class SetupUtils {
     if (flag) {
       try {
         if (flagFile.createNewFile()) {
-          System.out.println("Setup flag file created successfully.");
+          LOG.logInfo("Setup flag file created successfully.");
         } else {
-          System.out.println("Setup flag file already exists.");
+          LOG.logInfo("Setup flag file already exists.");
         }
       } catch (IOException e) {
-        System.err.println(
-          "Error creating the setup flag file: " + e.getMessage()
-        );
+        LOG.logWarn("Error creating the setup flag file: " + e.getMessage());
       }
     } else {
       if (flagFile.exists()) {
         if (flagFile.delete()) {
-          System.out.println("Setup flag file deleted successfully.");
+          LOG.logInfo("Setup flag file deleted successfully.");
         } else {
-          System.out.println("Unable to delete the setup flag file.");
+          LOG.logInfo("Unable to delete the setup flag file.");
         }
       } else {
-        System.out.println("Setup flag file doesn't exist.");
+        LOG.logInfo("Setup flag file doesn't exist.");
       }
     }
   }

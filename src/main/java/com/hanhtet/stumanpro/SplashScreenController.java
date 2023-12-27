@@ -60,7 +60,7 @@ public class SplashScreenController {
 
     timeline.setOnFinished(event -> {
       // Perform your initialization here
-      functions.InitializeProject();
+      functions.initializeProject();
 
       // Call the method indicating initialization is complete
       if (onInitializationComplete != null) {

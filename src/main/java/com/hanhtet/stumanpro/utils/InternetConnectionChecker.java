@@ -22,6 +22,6 @@ public class InternetConnectionChecker {
 
   public static void main(String[] args) {
     boolean isConnected = isInternetAvailable();
-    System.out.println("Internet connection available: " + isConnected);
+    LOG.logInfo("Internet connection available: " + isConnected);
   }
 }
