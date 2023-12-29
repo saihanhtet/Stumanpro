@@ -15,8 +15,6 @@ import javafx.scene.control.ListCell;
 
 public class Functions {
 
-  private Map<String, String> spreadsheetGroup;
-
   public void addUserToSession(User user) {
     UserSession userSession = UserSession.getInstance();
     userSession.loginUser(
@@ -71,7 +69,7 @@ public class Functions {
       List<Object> userData = user.getAllDataAsList();
       boolean result = addData(
         userData,
-        spreadsheetGroup.get(DATA.LCFA_USER),
+        DATA.getSpreadsheetGroup().get(DATA.LCFA_USER),
         DATA.USER_TABLE_RANGE,
         DATA.LCFA_USER
       );
@@ -95,7 +93,7 @@ public class Functions {
     if (InternetConnectionChecker.isInternetAvailable()) {
       try {
         List<List<Object>> existingData = OnSheetWriter.readFromSheet(
-          spreadsheetGroup.get(DATA.LCFA_USER),
+          DATA.getSpreadsheetGroup().get(DATA.LCFA_USER),
           DATA.USER_TABLE_RANGE
         );
         if (existingData != null && !existingData.isEmpty()) {
@@ -145,7 +143,7 @@ public class Functions {
     try {
       if (InternetConnectionChecker.isInternetAvailable()) {
         List<List<Object>> existingData = OnSheetWriter.readFromSheet(
-          spreadsheetGroup.get(DATA.LCFA_USER),
+          DATA.getSpreadsheetGroup().get(DATA.LCFA_USER),
           DATA.USER_TABLE_RANGE
         );
         if (existingData != null && !existingData.isEmpty()) {
@@ -170,7 +168,7 @@ public class Functions {
     if (InternetConnectionChecker.isInternetAvailable()) {
       OnSheetWriter.deleteRowById(
         course.getId(),
-        spreadsheetGroup.get(DATA.LCFA_COURSE),
+        DATA.getSpreadsheetGroup().get(DATA.LCFA_COURSE),
         DATA.COURSE_TABLE_RANGE
       );
     }
@@ -187,7 +185,7 @@ public class Functions {
     if (InternetConnectionChecker.isInternetAvailable()) {
       OnSheetWriter.deleteRowById(
         user.getId(),
-        spreadsheetGroup.get(DATA.LCFA_USER),
+        DATA.getSpreadsheetGroup().get(DATA.LCFA_USER),
         DATA.USER_TABLE_RANGE
       );
     }
@@ -202,9 +200,10 @@ public class Functions {
 
   public boolean addCourse(Course course) {
     List<Object> courseData = course.getAllDataAsList();
+
     boolean result = addData(
       courseData,
-      spreadsheetGroup.get(DATA.LCFA_COURSE),
+      DATA.getSpreadsheetGroup().get(DATA.LCFA_COURSE),
       DATA.COURSE_TABLE_RANGE,
       DATA.LCFA_COURSE
     );
@@ -253,7 +252,7 @@ public class Functions {
             List<Object> existingRowWithoutId = new ArrayList<>(
               row.subList(1, row.size())
             );
-            return existingRowWithoutId.equals(newRow);
+            return existingRowWithoutId.get(0).equals(newRow.get(0));
           })
       )
     ) {
@@ -357,7 +356,6 @@ public class Functions {
         spreadsheetId.put(DATA.LCFA_USER, lcfaUsers);
         spreadsheetId.put(DATA.LCFA_COURSE, lcfaCourses);
         OnSheetWriter.writeSpreadsheetInfoToFile(spreadsheetId);
-        spreadsheetGroup = OnSheetWriter.readSpreadsheetInfoFromFile();
 
         List<Object> userHeaderData = new ArrayList<>(
           List.of(
@@ -416,7 +414,6 @@ public class Functions {
         LOG.logInfo(
           "Google Sheets or local files already exist. Skipping setup."
         );
-        spreadsheetGroup = OnSheetWriter.readSpreadsheetInfoFromFile();
       }
     } else {
       LOG.logWarn("Please check your internet connection!");
@@ -427,12 +424,12 @@ public class Functions {
     if (InternetConnectionChecker.isInternetAvailable()) {
       OnSheetWriter.downloadFile(
         "lcfa_users",
-        spreadsheetGroup.get("lcfa_users"),
+        DATA.getSpreadsheetGroup().get("lcfa_users"),
         DATA.USER_TABLE_RANGE
       );
       OnSheetWriter.downloadFile(
         "lcfa_courses",
-        spreadsheetGroup.get("lcfa_courses"),
+        DATA.getSpreadsheetGroup().get("lcfa_courses"),
         DATA.COURSE_TABLE_RANGE
       );
     } else {

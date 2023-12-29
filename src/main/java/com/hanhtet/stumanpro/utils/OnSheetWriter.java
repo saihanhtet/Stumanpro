@@ -45,6 +45,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("unchecked")
 public class OnSheetWriter {
 
   private OnSheetWriter() {

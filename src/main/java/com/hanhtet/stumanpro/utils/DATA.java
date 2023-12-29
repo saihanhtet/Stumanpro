@@ -1,6 +1,7 @@
 package com.hanhtet.stumanpro.utils;
 
 import java.io.File;
+import java.util.Map;
 
 public class DATA {
 
@@ -22,6 +23,8 @@ public class DATA {
   public static final String DOWNLOAD_XLXS_FOLDER_PATH;
   public static final String HOME = "user.home";
 
+  private static Map<String, String> SPREADSHEET;
+
   public static final String LCFA_COURSE = "lcfa_courses";
   public static final String LCFA_USER = "lcfa_users";
 
@@ -38,4 +41,11 @@ public class DATA {
   public static final String MAINWINDOW_FXML = "MainWindow.fxml";
   public static final String LOGIN_FXML = "Login.fxml";
   public static final String SPLASH_FXML = "SplashScreen.fxml";
+
+  public static Map<String, String> getSpreadsheetGroup() {
+    if (SPREADSHEET == null) {
+      SPREADSHEET = OnSheetWriter.readSpreadsheetInfoFromFile();
+    }
+    return SPREADSHEET;
+  }
 }
